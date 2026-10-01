@@ -61,9 +61,11 @@ You can also add it via *Settings → Devices & services → Add integration →
   command and releases the desk after the idle timeout. In that mode the height shown is
   the last one seen while connected; moves made with the handset afterwards appear on
   the next connection (or use *Always connected*).
-- **Bluetooth proxies** must support active connections: a local adapter or an ESPHome
-  Bluetooth proxy with `active: true` works. Shelly Bluetooth proxies are passive only
-  and cannot control the desk.
+- **Bluetooth proxies** must support connections: a local adapter or an ESPHome
+  Bluetooth proxy with `bluetooth_proxy: active: true` works. Shelly devices cannot
+  connect, even with their "active" scanning mode enabled, so they cannot control the
+  desk. Home Assistant only offers the desk for setup once a connectable scanner hears
+  it: in *Bluetooth → Advertisement monitor* the desk must show `connectable: true`.
 - **The handset wins when held.** The desk ignores a held handset key while Home
   Assistant is moving it, but takes the key over when the move ends, and a stop from
   Home Assistant cannot stop a move driven by a held key. Pressing a handset key during

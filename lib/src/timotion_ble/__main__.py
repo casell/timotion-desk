@@ -9,18 +9,18 @@ from bleak import BleakScanner
 from bleak.backends.device import BLEDevice
 
 from .desk import MAX_MOTION, TimotionDesk
-from .protocol import NUS_SERVICE_UUID
 
 NAME_PREFIX = "stand UP"
 
 
 async def _scan(timeout: float) -> list[tuple[BLEDevice, int]]:
-    # Name and service both: other devices (sensors, ...) also advertise the Nordic UART.
+    # By name: the advertisement has only flags and the name (the NUS UUID is in the scan
+    # response), and other devices advertise the Nordic UART service too.
     found = await BleakScanner.discover(timeout=timeout, return_adv=True)
     return [
         (device, adv.rssi)
         for device, adv in found.values()
-        if (adv.local_name or "").startswith(NAME_PREFIX) and NUS_SERVICE_UUID in adv.service_uuids
+        if (adv.local_name or "").startswith(NAME_PREFIX)
     ]
 
 

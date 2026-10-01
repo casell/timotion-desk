@@ -22,7 +22,6 @@ from pathlib import Path
 # Needed to pick the desk connection out of a btsnoop file; probe.py scans by name.
 DESK_ADDRESS = os.environ.get("TIMOTION_ADDRESS")
 NAME_PREFIX = "stand UP"
-NUS_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
 WRITE_HANDLE = 0x000E
 NOTIFY_HANDLE = 0x000B
 

@@ -17,7 +17,6 @@ from homeassistant.helpers.selector import (
     NumberSelectorMode,
     TextSelector,
 )
-from timotion_ble import NUS_SERVICE_UUID
 
 from .const import (
     CONF_ALWAYS_CONNECTED,
@@ -34,8 +33,9 @@ from .const import (
 
 
 def _is_desk(info: BluetoothServiceInfoBleak) -> bool:
-    # Other devices (sensors, ...) advertise the Nordic UART service too.
-    return (info.name or "").startswith(NAME_PREFIX) and NUS_SERVICE_UUID in info.service_uuids
+    # By name only: the advertisement carries just flags and the name, the NUS service
+    # UUID is in the scan response, which passive scanners never see.
+    return (info.name or "").startswith(NAME_PREFIX)
 
 
 class TimotionConfigFlow(ConfigFlow, domain=DOMAIN):

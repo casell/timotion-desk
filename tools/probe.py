@@ -34,7 +34,7 @@ from pathlib import Path
 from bleak import BleakClient, BleakScanner
 
 sys.path.insert(0, str(Path(__file__).parent))
-from btsnoop import DESK_ADDRESS, NAME_PREFIX, NUS_SERVICE_UUID, check_frame  # noqa: E402
+from btsnoop import DESK_ADDRESS, NAME_PREFIX, check_frame
 
 NOTIFY_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e"
 WRITE_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e"
@@ -115,8 +115,7 @@ async def connect(probe, address, handshake=True, init=True):
     else:
         probe.log(f"scanning for a '{NAME_PREFIX}' desk (set --address or TIMOTION_ADDRESS)")
         device = await BleakScanner.find_device_by_filter(
-            lambda _d, adv: (adv.local_name or "").startswith(NAME_PREFIX)
-            and NUS_SERVICE_UUID in adv.service_uuids,
+            lambda _d, adv: (adv.local_name or "").startswith(NAME_PREFIX),
             timeout=15,
         )
     if device is None:

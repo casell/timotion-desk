@@ -13,7 +13,7 @@ from custom_components.timotion_desk.const import (
     DOMAIN,
 )
 
-from .conftest import ADDRESS, NAME, service_info
+from .conftest import ADDRESS, NAME, NUS, service_info
 
 DISCOVERED = "custom_components.timotion_desk.config_flow.async_discovered_service_info"
 
@@ -36,14 +36,14 @@ async def test_bluetooth_discovery_other_nus_device(hass: HomeAssistant, enable_
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": SOURCE_BLUETOOTH},
-        data=service_info(name="Sensor", address="AA:BB:CC:DD:EE:01"),
+        data=service_info(name="Sensor", address="AA:BB:CC:DD:EE:01", uuids=(NUS,)),
     )
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "not_supported"
 
 
 async def test_user_pick(hass: HomeAssistant, enable_bluetooth) -> None:
-    other = service_info(name="Sensor", address="AA:BB:CC:DD:EE:01")
+    other = service_info(name="Sensor", address="AA:BB:CC:DD:EE:01", uuids=(NUS,))
     with patch(DISCOVERED, return_value=[service_info(), other]):
         result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
         assert result["type"] is FlowResultType.FORM

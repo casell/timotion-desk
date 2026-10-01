@@ -5,8 +5,10 @@ Reverse-engineered for a TiMOTION TC15S controller with built-in BLE module, sol
 desk used for testing.
 
 ## Device
-- Advertises as "stand UP- XXXX" (with a space) and the Nordic UART service. Other
-  devices advertise the NUS service too: match the name prefix "stand UP" AND the service.
+- Advertising data: only flags and the complete local name "stand UP- XXXX" (with a
+  space), e.g. `02 01 06 0f 09 "stand UP- 0000"`. The Nordic UART service UUID is only in
+  the scan response, so passive scanners never see it: match on the name prefix
+  "stand UP" alone (other devices advertise the NUS service too, under other names).
   Single connection at a time: the vendor app "Stand Up Pls" must be disconnected.
 - Nordic UART Service 6e400001-b5a3-f393-e0a9-e50e24dcca9e
   - 6e400003-...: notify, desk -> host (status frames)

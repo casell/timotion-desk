@@ -15,11 +15,10 @@ from custom_components.timotion_desk.const import DOMAIN
 ADDRESS = "AA:BB:CC:DD:EE:FF"
 NAME = "stand UP- 1234"
 NUS = "6e400001-b5a3-f393-e0a9-e50e24dcca9e"
+# The real desk advertisement carries no service UUIDs (only flags and the name).
 
 
-def service_info(
-    name: str = NAME, address: str = ADDRESS, uuids=(NUS,)
-) -> BluetoothServiceInfoBleak:
+def service_info(name: str = NAME, address: str = ADDRESS, uuids=()) -> BluetoothServiceInfoBleak:
     device = MagicMock(address=address)
     device.name = name
     return BluetoothServiceInfoBleak(

@@ -4,7 +4,6 @@
   "bluetooth": [
     {
       "local_name": "stand UP*",
-      "service_uuid": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
       "connectable": true
     }
   ],
@@ -20,7 +19,7 @@
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/casell/timotion-desk/issues",
   "requirements": [
-    "timotion-ble@https://github.com/casell/timotion-desk/releases/download/v0.1.0/timotion_ble-0.1.0-py3-none-any.whl"
+    "timotion-ble@https://github.com/casell/timotion-desk/releases/download/v0.1.1/timotion_ble-0.1.1-py3-none-any.whl"
   ],
-  "version": "0.1.0"
+  "version": "0.1.1"
 }

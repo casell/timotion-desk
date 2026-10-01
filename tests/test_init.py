@@ -21,12 +21,14 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import ATTR_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.timotion_desk.const import (
     CONF_ALWAYS_CONNECTED,
+    CONF_EXPOSE_COVER,
     CONF_IDLE_TIMEOUT,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
@@ -62,11 +64,31 @@ async def test_setup_reads_state(
     assert entry.state is ConfigEntryState.LOADED
     assert desk.calls[0] == "connect"  # initial read of height, limits, presets
     assert hass.states.get(HEIGHT_ID).state == "78.0"
-    cover = hass.states.get(COVER_ID)
-    # 780 mm within the desk limits 705-1250 mm
-    assert cover.attributes["current_position"] == round((780 - 705) * 100 / (1250 - 705))
+    assert hass.states.get(COVER_ID) is None  # opt-in
     assert hass.states.get(CONNECTED_ID).state == STATE_ON
     assert hass.states.get("button.stand_up_1234_handset_preset_2").state != STATE_UNAVAILABLE
+
+
+async def test_cover_position(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+):
+    await setup(hass, entry, {CONF_EXPOSE_COVER: True})
+    # 780 mm within the desk limits 705-1250 mm
+    position = hass.states.get(COVER_ID).attributes["current_position"]
+    assert position == round((780 - 705) * 100 / (1250 - 705))
+
+
+async def test_cover_removed_when_option_off(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+):
+    await setup(hass, entry, {CONF_EXPOSE_COVER: True})
+    registry = er.async_get(hass)
+    assert registry.async_get(COVER_ID) is not None
+    hass.config_entries.async_update_entry(entry, options={CONF_EXPOSE_COVER: False})
+    await hass.async_block_till_done()  # options change reloads the entry
+    assert registry.async_get(COVER_ID) is None
+    assert hass.states.get(COVER_ID) is None
+    assert hass.states.get(HEIGHT_ID) is not None
 
 
 async def test_not_advertising_retries(hass: HomeAssistant, enable_bluetooth, fake_desk, entry):
@@ -80,7 +102,9 @@ async def test_not_advertising_retries(hass: HomeAssistant, enable_bluetooth, fa
 async def test_cover_commands(
     hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
 ):
-    desk = await setup(hass, entry, {CONF_MIN_HEIGHT: 70.0, CONF_MAX_HEIGHT: 120.0})
+    desk = await setup(
+        hass, entry, {CONF_MIN_HEIGHT: 70.0, CONF_MAX_HEIGHT: 120.0, CONF_EXPOSE_COVER: True}
+    )
     await call(hass, COVER, SERVICE_SET_COVER_POSITION, COVER_ID, **{ATTR_POSITION: 50})
     assert desk.calls[-1] == ("move_to", 950)
     await call(hass, COVER, SERVICE_OPEN_COVER, COVER_ID)
@@ -110,7 +134,7 @@ async def test_number_and_buttons(
 
 
 async def test_moving_sensor(hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry):
-    desk = await setup(hass, entry)
+    desk = await setup(hass, entry, {CONF_EXPOSE_COVER: True})
     desk.moving = "up"
     desk.fire()
     await hass.async_block_till_done()

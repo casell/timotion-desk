@@ -20,6 +20,7 @@ from homeassistant.helpers.selector import (
 
 from .const import (
     CONF_ALWAYS_CONNECTED,
+    CONF_EXPOSE_COVER,
     CONF_IDLE_TIMEOUT,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
@@ -136,6 +137,7 @@ class TimotionOptionsFlow(OptionsFlow):
                 )
             ),
             vol.Required(CONF_ALWAYS_CONNECTED, default=False): BooleanSelector(),
+            vol.Required(CONF_EXPOSE_COVER, default=False): BooleanSelector(),
         }
         for i in range(1, PRESET_COUNT + 1):
             schema[vol.Optional(CONF_PRESET_NAME.format(i))] = TextSelector()

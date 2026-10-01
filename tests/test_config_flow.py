@@ -7,6 +7,7 @@ from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.timotion_desk.const import (
     CONF_ALWAYS_CONNECTED,
+    CONF_EXPOSE_COVER,
     CONF_IDLE_TIMEOUT,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
@@ -90,6 +91,7 @@ async def test_options(hass: HomeAssistant, entry) -> None:
         CONF_MAX_HEIGHT: 120,
         CONF_IDLE_TIMEOUT: 30,
         CONF_ALWAYS_CONNECTED: True,
+        CONF_EXPOSE_COVER: True,
         "preset_1_name": "Sit",
         "preset_1_height": 78,
     }

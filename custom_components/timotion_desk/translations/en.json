@@ -27,6 +27,7 @@
           "max_height": "Highest height",
           "idle_timeout": "Disconnect after idle",
           "always_connected": "Always connected",
+          "expose_cover": "Show as cover",
           "preset_1_name": "Preset 1 name",
           "preset_2_name": "Preset 2 name",
           "preset_3_name": "Preset 3 name",
@@ -40,7 +41,8 @@
           "min_height": "Height for cover position 0 (closed). Empty: the desk's lower limit.",
           "max_height": "Height for cover position 100 (open). Empty: the desk's upper limit.",
           "idle_timeout": "Seconds to keep the connection after the last move, then release it so the vendor app can connect.",
-          "always_connected": "Keep the connection open: live height updates (also when the handset moves the desk), and the desk does not go into standby after about an hour idle. The vendor app cannot connect meanwhile."
+          "always_connected": "Keep the connection open: live height updates (also when the handset moves the desk), and the desk does not go into standby after about an hour idle. The vendor app cannot connect meanwhile.",
+          "expose_cover": "Adds a cover entity with a position slider. Off by default: \"close all covers\" (in an area or the whole home) would also move the desk."
         }
       }
     },

@@ -35,7 +35,7 @@ You can also add it via *Settings → Devices & services → Add integration →
 
 | Entity | |
 |---|---|
-| Cover | position 0–100 over the height range (open = highest, close = lowest), stop |
+| Cover (optional, off by default) | position 0–100 over the height range (open = highest, close = lowest), stop |
 | Height sensor | cm, 1 decimal |
 | Target height number | set a height in cm to move there |
 | Moving binary sensor | |
@@ -53,6 +53,8 @@ You can also add it via *Settings → Devices & services → Add integration →
 - **Always connected**: keep the connection open. Gives live height updates (also when
   the handset moves the desk) and keeps the desk out of standby (see below), but the
   vendor app cannot connect meanwhile.
+- **Show as cover**: add the cover entity. Off by default, because actions on all covers
+  (of an area, or of the whole home) would otherwise move the desk with the blinds.
 - **Presets**: up to four named heights, one button each. The vendor app's presets live
   in the app, not in the desk, so they are not available here.
 

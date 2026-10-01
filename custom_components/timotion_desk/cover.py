@@ -1,11 +1,17 @@
-"""Desk as a cover: position 0-100 over the configured height range."""
+"""Desk as a cover: position 0-100 over the configured height range.
+
+Opt-in (option "Show as cover"): actions on all covers of an area or of the whole home
+would otherwise move the desk together with blinds and shutters.
+"""
 
 from typing import Any
 
 from homeassistant.components.cover import ATTR_POSITION, CoverEntity, CoverEntityFeature
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .const import CONF_EXPOSE_COVER
 from .coordinator import TimotionConfigEntry
 from .entity import TimotionEntity
 
@@ -15,7 +21,14 @@ async def async_setup_entry(
     entry: TimotionConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    async_add_entities([TimotionCover(entry.runtime_data, "desk")])
+    cover = TimotionCover(entry.runtime_data, "desk")
+    if entry.options.get(CONF_EXPOSE_COVER, False):
+        async_add_entities([cover])
+        return
+    # Option off: drop a cover created earlier instead of leaving an orphaned entity.
+    registry = er.async_get(hass)
+    if entity_id := registry.async_get_entity_id("cover", entry.domain, cover.unique_id):
+        registry.async_remove(entity_id)
 
 
 class TimotionCover(TimotionEntity, CoverEntity):

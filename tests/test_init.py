@@ -21,6 +21,7 @@ from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import ATTR_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
@@ -29,6 +30,7 @@ from custom_components.timotion_desk.const import (
     CONF_IDLE_TIMEOUT,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
+    DOMAIN,
 )
 
 COVER_ID = "cover.stand_up_1234"
@@ -197,3 +199,11 @@ async def test_unload(hass: HomeAssistant, enable_bluetooth, desk_present, fake_
     desk = await setup(hass, entry)
     assert await hass.config_entries.async_unload(entry.entry_id)
     assert not desk.connected
+
+
+async def test_brand_icon(hass: HomeAssistant):
+    """The integration ships its own icon (served by HA's brands view)."""
+    integration = await async_get_integration(hass, DOMAIN)
+    assert integration.has_branding
+    brand = integration.file_path / "brand"
+    assert {p.name for p in brand.iterdir()} >= {"icon.png", "icon@2x.png"}

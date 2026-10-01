@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Standing desk pictogram for the TiMOTION Desk integration (not a vendor logo). -->
+  <g fill="#18BCF2">
+    <!-- desktop -->
+    <rect x="24" y="80" width="464" height="60" rx="16"/>
+    <!-- legs: inner (upper) and outer (lower) telescoping sections -->
+    <rect x="98" y="140" width="40" height="170" rx="6"/>
+    <rect x="88" y="296" width="60" height="140" rx="8"/>
+    <rect x="374" y="140" width="40" height="170" rx="6"/>
+    <rect x="364" y="296" width="60" height="140" rx="8"/>
+    <!-- feet -->
+    <rect x="40" y="430" width="156" height="40" rx="14"/>
+    <rect x="316" y="430" width="156" height="40" rx="14"/>
+  </g>
+  <!-- height arrow between the legs -->
+  <g fill="#0B87C2">
+    <rect x="244" y="222" width="24" height="132" rx="6"/>
+    <path d="M256 168 L310 232 L202 232 Z"/>
+    <path d="M256 410 L310 346 L202 346 Z"/>
+  </g>
+</svg>

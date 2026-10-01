@@ -10,6 +10,8 @@ This repository contains:
 - [`lib`](lib): [`timotion-ble`](lib/README.md), the standalone Python library and CLI it
   uses
 - [`PROTOCOL.md`](PROTOCOL.md): the reverse-engineered BLE protocol
+- [`assets/icon.svg`](assets/icon.svg): source of the integration icon (shipped as PNGs
+  in `custom_components/timotion_desk/brand/`)
 - [`tools`](tools) and [`captures`](captures): protocol tooling and the hardware test logs
   the protocol description is based on. The vendor-app capture the protocol was first
   decoded from is not published: phone Bluetooth logs contain personal data.

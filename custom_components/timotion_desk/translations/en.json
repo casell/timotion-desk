@@ -40,7 +40,7 @@
           "min_height": "Height for cover position 0 (closed). Empty: the desk's lower limit.",
           "max_height": "Height for cover position 100 (open). Empty: the desk's upper limit.",
           "idle_timeout": "Seconds to keep the connection after the last move, then release it so the vendor app can connect.",
-          "always_connected": "Keep the connection open for live height updates (also when the handset moves the desk). The vendor app cannot connect meanwhile."
+          "always_connected": "Keep the connection open: live height updates (also when the handset moves the desk), and the desk does not go into standby after about an hour idle. The vendor app cannot connect meanwhile."
         }
       }
     },

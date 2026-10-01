@@ -64,6 +64,13 @@ Speed ~38-40 mm/s. Latency: status echoes a new command after ~0.2-0.3 s, height
 changing after ~0.45-0.6 s. The controller enforces the travel limits by itself (a down
 stream stops at the min limit with ease-out).
 No keepalive needed: an idle connection held 300 s with nothing sent after init.
+Standby: about 60 minutes after the last activity (a handset key, or the end of the last
+BLE connection) the desk goes into standby and stops advertising entirely: no scanner
+hears it, nothing can connect, and the vendor app cannot reach it either. There is no BLE
+wake-up: only a handset key press brings it back (it advertises again within seconds).
+Measured: a move worked 39.5 min after the last handset press; 60 min after the last BLE
+disconnect the advertisements stopped. An open connection prevents standby: with a
+connection held (and nothing sent) the desk was still controllable after 71 min.
 On a warm reconnect frames arrive without handshake and motion works without init;
 cold state untested, so always send both (cheap).
 Handset vs BLE: while a BLE go-to streams, a handset key shows in ST (key bit) but is

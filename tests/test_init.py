@@ -1,7 +1,8 @@
 from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
+from homeassistant.components import bluetooth
 from homeassistant.components.button import DOMAIN as BUTTON
 from homeassistant.components.button import SERVICE_PRESS
 from homeassistant.components.cover import (
@@ -160,13 +161,21 @@ async def test_always_connected(
     assert desk.connected
 
 
+@pytest.mark.parametrize(
+    ("silent_s", "message"),
+    [(2, "Cannot connect to"), (600, "probably in standby")],
+)
 async def test_connect_failure_raises(
-    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry, silent_s, message
 ):
     desk = await setup(hass, entry)
     await desk.disconnect()
     desk.fail_connect = True
-    with pytest.raises(HomeAssistantError):
+    last = MagicMock(time=bluetooth.MONOTONIC_TIME() - silent_s)
+    with (
+        patch("homeassistant.components.bluetooth.async_last_service_info", return_value=last),
+        pytest.raises(HomeAssistantError, match=message),
+    ):
         await hass.services.async_call(
             NUMBER, SERVICE_SET_VALUE, {ATTR_ENTITY_ID: TARGET_ID, ATTR_VALUE: 100}, blocking=True
         )

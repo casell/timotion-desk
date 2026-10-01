@@ -38,6 +38,9 @@ _LOGGER = logging.getLogger(__name__)
 type TimotionConfigEntry = ConfigEntry[DeskCoordinator]
 
 CONNECT_ERRORS = (BleakError, TimotionError, TimeoutError)
+# The desk advertises about once a second while awake. After about an hour idle it goes
+# into standby and stops advertising; only a handset key wakes it, nothing over BLE does.
+STANDBY_SILENCE = 30  # s without advertisements before a failed connect means standby
 
 
 class DeskCoordinator:
@@ -193,7 +196,17 @@ class DeskCoordinator:
             await self.desk.connect()
         except CONNECT_ERRORS as err:
             self._schedule_idle_disconnect()
+            if self._silent_for() > STANDBY_SILENCE:
+                raise HomeAssistantError(
+                    f"{self.entry.title} is not advertising, probably in standby (it sleeps "
+                    "after about an hour idle). Press any key on the handset, then retry."
+                ) from err
             raise HomeAssistantError(f"Cannot connect to {self.entry.title}: {err}") from err
+
+    def _silent_for(self) -> float:
+        """Seconds since the last advertisement from the desk (inf if never seen)."""
+        info = bluetooth.async_last_service_info(self.hass, self.address, connectable=True)
+        return bluetooth.MONOTONIC_TIME() - info.time if info else float("inf")
 
     @callback
     def _schedule_reconnect(self, delay: float = RECONNECT_DELAY) -> None:

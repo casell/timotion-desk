@@ -48,8 +48,9 @@ You can also add it via *Settings → Devices & services → Add integration →
   the travel limits configured on the desk.
 - **Disconnect after idle**: seconds to keep the connection after the last move
   (default 60).
-- **Always connected**: keep the connection for live height updates, also when the
-  handset moves the desk.
+- **Always connected**: keep the connection open. Gives live height updates (also when
+  the handset moves the desk) and keeps the desk out of standby (see below), but the
+  vendor app cannot connect meanwhile.
 - **Presets**: up to four named heights, one button each. The vendor app's presets live
   in the app, not in the desk, so they are not available here.
 
@@ -61,6 +62,11 @@ You can also add it via *Settings → Devices & services → Add integration →
   command and releases the desk after the idle timeout. In that mode the height shown is
   the last one seen while connected; moves made with the handset afterwards appear on
   the next connection (or use *Always connected*).
+- **Standby after about an hour.** About 60 minutes after its last activity the desk
+  stops advertising and cannot be reached over Bluetooth at all, not even by the vendor
+  app. Only a key press on the handset wakes it. Home Assistant then reports that the
+  desk is probably in standby. An open connection keeps it awake: turn on *Always
+  connected* if the desk must be controllable from Home Assistant at any time.
 - **Bluetooth proxies** must support connections: a local adapter or an ESPHome
   Bluetooth proxy with `bluetooth_proxy: active: true` works. Shelly devices cannot
   connect, even with their "active" scanning mode enabled, so they cannot control the

@@ -1,0 +1,200 @@
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 4e 00 00 00 00 00 4b        ..0.ed.N.....K
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 4e 00 00 00 00 00 4b        ..0.ed.N.....K
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 4d 00 00 00 00 00 4a        ..0.ed.M.....J
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 4b 00 00 00 00 00 48        ..0.ed.K.....H
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 48 00 00 00 00 00 45        ..0.ed.H.....E
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 45 00 00 00 00 00 42        ..0.ed.E.....B
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 41 00 00 00 00 00 3e        ..0.ed.A.....>
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 3d 00 00 00 00 00 3a        ..0.ed.=.....:
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 39 00 00 00 00 00 36        ..0.ed.9.....6
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 34 00 00 00 00 00 31        ..0.ed.4.....1
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 30 00 00 00 00 00 2d        ..0.ed.0.....-
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 2c 00 00 00 00 00 29        ..0.ed.,.....)
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 28 00 00 00 00 00 25        ..0.ed.(.....%
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 24 00 00 00 00 00 21        ..0.ed.$.....!
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 1f 00 00 00 00 00 1c        ..0.ed........
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 65 64 04 1b 00 00 00 00 00 18        ..0.ed........
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 25 64 04 16 00 00 00 00 00 53        ..0.%d.......S
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 25 64 04 12 00 00 00 00 00 4f        ..0.%d.......O
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 25 64 04 0e 00 00 00 00 00 4b        ..0.%d.......K
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 25 64 04 0b 00 00 00 00 00 48        ..0.%d.......H
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 25 64 04 0a 00 00 00 00 00 47        ..0.%d.......G
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 0a 00 00 00 00 00 27        ..0..d.......'
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 0a 00 00 00 00 00 27        ..0..d.......'
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 0a 00 00 00 00 00 27        ..0..d.......'
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 0a 00 00 00 00 00 27        ..0..d.......'
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 0a 00 00 00 00 00 77        ..0.Ud.......w
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 0a 00 00 00 00 00 77        ..0.Ud.......w
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 0a 00 00 00 00 00 77        ..0.Ud.......w
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 0b 00 00 00 00 00 78        ..0.Ud.......x
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 0d 00 00 00 00 00 7a        ..0.Ud.......z
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 0f 00 00 00 00 00 7c        ..0.Ud.......|
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 13 00 00 00 00 00 00        ..0.Ud........
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 16 00 00 00 00 00 03        ..0.Ud........
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 1a 00 00 00 00 00 07        ..0.Ud........
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 1e 00 00 00 00 00 0b        ..0.Ud........
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 22 00 00 00 00 00 0f        ..0.Ud."......
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 27 00 00 00 00 00 14        ..0.Ud.'......
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 2c 00 00 00 00 00 19        ..0.Ud.,......
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 30 00 00 00 00 00 1d        ..0.Ud.0......
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 34 00 00 00 00 00 21        ..0.Ud.4.....!
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 38 00 00 00 00 00 25        ..0.Ud.8.....%
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 3d 00 00 00 00 00 2a        ..0.Ud.=.....*
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 41 00 00 00 00 00 2e        ..0.Ud.A......
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 45 00 00 00 00 00 32        ..0.Ud.E.....2
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 48 00 00 00 00 00 35        ..0.Ud.H.....5
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 4a 00 00 00 00 00 37        ..0.Ud.J.....7
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 4c 00 00 00 00 00 39        ..0.Ud.L.....9
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 55 64 04 4d 00 00 00 00 00 3a        ..0.Ud.M.....:
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 45 64 04 4e 00 00 00 00 00 2b        ..0.Ed.N.....+
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 45 64 04 4e 00 00 00 00 00 2b        ..0.Ed.N.....+
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 45 64 04 4e 00 00 00 00 00 2b        ..0.Ed.N.....+
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 01 30 00 05 64 04 4e 00 00 00 00 00 6b        ..0..d.N.....k
+[CHG] Attribute /org/bluez/hci0/dev_AA_BB_CC_DD_EE_FF/service0009/char000a Value:
+  9d 02 30 00 05 64 02 c1 04 e2 03 0e 04 4d 04 b0  ..0..d.......M..
+  02 8a 64                                         ..d

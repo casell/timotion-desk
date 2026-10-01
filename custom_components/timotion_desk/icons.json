@@ -1,0 +1,27 @@
+{
+  "entity": {
+    "cover": {
+      "desk": {
+        "default": "mdi:desk"
+      }
+    },
+    "sensor": {
+      "height": {
+        "default": "mdi:arrow-expand-vertical"
+      }
+    },
+    "number": {
+      "target_height": {
+        "default": "mdi:arrow-expand-vertical"
+      }
+    },
+    "button": {
+      "stop": {
+        "default": "mdi:stop"
+      },
+      "handset_preset": {
+        "default": "mdi:numeric"
+      }
+    }
+  }
+}

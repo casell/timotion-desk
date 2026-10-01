@@ -1,0 +1,54 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * 1"
+
+jobs:
+  hassfest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hacs/action@main
+        with:
+          category: integration
+          ignore: brands
+
+  library:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv venv --python 3.12 .venv && uv pip install -e 'lib[test]'
+      - run: cd lib && ../.venv/bin/python -m pytest -q
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install Home Assistant test environment
+        run: |
+          uv venv --python 3.14 .venv-ha
+          uv pip install --python .venv-ha/bin/python pytest-homeassistant-custom-component -e lib
+          # Requirements of the HA components the integration depends on.
+          .venv-ha/bin/python - <<'EOF' > ha-requirements.txt
+          import json, pathlib, homeassistant
+          root = pathlib.Path(homeassistant.__file__).parent / "components"
+          reqs = set()
+          for name in ("bluetooth", "bluetooth_adapters", "usb"):
+              path = root / name / "manifest.json"
+              if path.exists():
+                  reqs |= set(json.loads(path.read_text()).get("requirements", []))
+          print("\n".join(sorted(reqs)))
+          EOF
+          uv pip install --python .venv-ha/bin/python -r ha-requirements.txt
+      - run: .venv-ha/bin/python -m pytest -q

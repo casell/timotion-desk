@@ -1,0 +1,26 @@
+{
+  "domain": "timotion_desk",
+  "name": "TiMOTION Desk",
+  "bluetooth": [
+    {
+      "local_name": "stand UP*",
+      "service_uuid": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+      "connectable": true
+    }
+  ],
+  "codeowners": [
+    "@casell"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "bluetooth_adapters"
+  ],
+  "documentation": "https://github.com/casell/timotion-desk",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/casell/timotion-desk/issues",
+  "requirements": [
+    "timotion-ble@https://github.com/casell/timotion-desk/releases/download/v0.1.0/timotion_ble-0.1.0-py3-none-any.whl"
+  ],
+  "version": "0.1.0"
+}

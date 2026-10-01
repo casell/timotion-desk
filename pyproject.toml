@@ -1,0 +1,9 @@
+# Test and lint settings for the Home Assistant integration (the library has its own
+# pyproject.toml in lib/).
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100

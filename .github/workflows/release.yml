@@ -1,0 +1,45 @@
+name: Release
+
+# Publishing a GitHub release vX.Y.Z builds the library wheel and attaches it to the
+# release; the integration's manifest installs the library from that URL.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Check versions match the tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, sys, tomllib
+          tag = os.environ["TAG"]
+          version = tag.removeprefix("v")
+          lib = tomllib.load(open("lib/pyproject.toml", "rb"))["project"]["version"]
+          manifest = json.load(open("custom_components/timotion_desk/manifest.json"))
+          wheel = f"/releases/download/{tag}/timotion_ble-{version}-py3-none-any.whl"
+          errors = []
+          if lib != version:
+              errors.append(f"lib/pyproject.toml version {lib} != {version}")
+          if manifest["version"] != version:
+              errors.append(f"manifest version {manifest['version']} != {version}")
+          if not any(r.endswith(wheel) for r in manifest["requirements"]):
+              errors.append(f"manifest requirement does not point to ...{wheel}")
+          if errors:
+              sys.exit("\n".join(errors))
+          EOF
+      - run: uv build --wheel lib --out-dir dist
+      - name: Attach wheel to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" dist/*.whl --clobber

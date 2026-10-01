@@ -1,0 +1,79 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "user": {
+        "description": "Pick the desk. The vendor app must be disconnected: the desk accepts one connection at a time.",
+        "data": {
+          "address": "Desk"
+        }
+      },
+      "bluetooth_confirm": {
+        "description": "Set up {name}? The vendor app must be disconnected: the desk accepts one connection at a time."
+      }
+    },
+    "abort": {
+      "already_configured": "This desk is already configured",
+      "no_devices_found": "No TiMOTION desk found. Make sure it is powered and not connected to the vendor app.",
+      "not_supported": "This device is not a supported TiMOTION desk"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Travel limits reported by the desk: {limits}.",
+        "data": {
+          "min_height": "Lowest height",
+          "max_height": "Highest height",
+          "idle_timeout": "Disconnect after idle",
+          "always_connected": "Always connected",
+          "preset_1_name": "Preset 1 name",
+          "preset_2_name": "Preset 2 name",
+          "preset_3_name": "Preset 3 name",
+          "preset_4_name": "Preset 4 name",
+          "preset_1_height": "Preset 1 height",
+          "preset_2_height": "Preset 2 height",
+          "preset_3_height": "Preset 3 height",
+          "preset_4_height": "Preset 4 height"
+        },
+        "data_description": {
+          "min_height": "Height for cover position 0 (closed). Empty: the desk's lower limit.",
+          "max_height": "Height for cover position 100 (open). Empty: the desk's upper limit.",
+          "idle_timeout": "Seconds to keep the connection after the last move, then release it so the vendor app can connect.",
+          "always_connected": "Keep the connection open for live height updates (also when the handset moves the desk). The vendor app cannot connect meanwhile."
+        }
+      }
+    },
+    "error": {
+      "min_above_max": "The lowest height must be below the highest height"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "moving": {
+        "name": "Moving"
+      },
+      "connected": {
+        "name": "Connection"
+      }
+    },
+    "button": {
+      "stop": {
+        "name": "Stop"
+      },
+      "handset_preset": {
+        "name": "Handset preset {number}"
+      }
+    },
+    "number": {
+      "target_height": {
+        "name": "Target height"
+      }
+    },
+    "sensor": {
+      "height": {
+        "name": "Height"
+      }
+    }
+  }
+}

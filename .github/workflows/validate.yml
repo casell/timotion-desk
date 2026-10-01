@@ -27,6 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          cache-suffix: ${{ github.job }}  # one cache per job, they run in parallel
       - run: uv venv --python 3.12 .venv && uv pip install -e 'lib[test]'
       - run: cd lib && ../.venv/bin/python -m pytest -q
 
@@ -35,6 +37,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          cache-suffix: ${{ github.job }}  # one cache per job, they run in parallel
       - name: Install Home Assistant test environment
         run: |
           uv venv --python 3.14 .venv-ha

@@ -54,6 +54,7 @@ class FakeDesk:
         self.config: ConfigFrame | None = None
         self.calls: list = []
         self.fail_connect = False
+        self.last_frame_age: float | None = None
         self._callbacks: list = []
 
     def register_callback(self, callback):
@@ -70,6 +71,7 @@ class FakeDesk:
     async def connect(self) -> None:
         if self.fail_connect:
             raise TimeoutError("no answer")
+        self.last_frame_age = 0.0
         if not self.connected:
             self.connected = True
             self.height_mm = 780

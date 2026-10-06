@@ -15,19 +15,28 @@ from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
     NumberSelectorMode,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
     TextSelector,
 )
 
 from .const import (
     CONF_ALWAYS_CONNECTED,
+    CONF_CONNECTION_MODE,
     CONF_EXPOSE_COVER,
     CONF_IDLE_TIMEOUT,
+    CONF_KEEP_AWAKE_INTERVAL,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
     CONF_PRESET_HEIGHT,
     CONF_PRESET_NAME,
+    CONNECTION_MODES,
     DEFAULT_IDLE_TIMEOUT,
+    DEFAULT_KEEP_AWAKE_INTERVAL,
     DOMAIN,
+    MODE_ALWAYS,
+    MODE_ON_DEMAND,
     NAME_PREFIX,
     PRESET_COUNT,
 )
@@ -136,17 +145,37 @@ class TimotionOptionsFlow(OptionsFlow):
                     mode=NumberSelectorMode.BOX,
                 )
             ),
-            vol.Required(CONF_ALWAYS_CONNECTED, default=False): BooleanSelector(),
+            vol.Required(CONF_CONNECTION_MODE, default=MODE_ON_DEMAND): SelectSelector(
+                SelectSelectorConfig(
+                    options=CONNECTION_MODES,
+                    translation_key=CONF_CONNECTION_MODE,
+                    mode=SelectSelectorMode.LIST,
+                )
+            ),
+            vol.Required(
+                CONF_KEEP_AWAKE_INTERVAL, default=DEFAULT_KEEP_AWAKE_INTERVAL
+            ): NumberSelector(
+                NumberSelectorConfig(
+                    min=10,
+                    max=55,
+                    step=1,
+                    unit_of_measurement=UnitOfTime.MINUTES,
+                    mode=NumberSelectorMode.BOX,
+                )
+            ),
             vol.Required(CONF_EXPOSE_COVER, default=False): BooleanSelector(),
         }
         for i in range(1, PRESET_COUNT + 1):
             schema[vol.Optional(CONF_PRESET_NAME.format(i))] = TextSelector()
             schema[vol.Optional(CONF_PRESET_HEIGHT.format(i))] = _height_selector()
 
+        current = dict(self.config_entry.options)
+        if CONF_CONNECTION_MODE not in current and current.pop(CONF_ALWAYS_CONNECTED, False):
+            current[CONF_CONNECTION_MODE] = MODE_ALWAYS  # option saved before 0.1.5
         return self.async_show_form(
             step_id="init",
             data_schema=self.add_suggested_values_to_schema(
-                vol.Schema(schema), user_input or self.config_entry.options
+                vol.Schema(schema), user_input or current
             ),
             errors=errors,
             description_placeholders={"limits": self._limits()},

@@ -8,7 +8,7 @@ app), and tells the entities when to refresh.
 
 import logging
 from collections.abc import Callable, Coroutine
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from bleak.exc import BleakError
@@ -16,21 +16,29 @@ from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.event import async_call_later
+from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from timotion_ble import TimotionDesk, TimotionError
 
 from .const import (
     CONF_ALWAYS_CONNECTED,
+    CONF_CONNECTION_MODE,
     CONF_IDLE_TIMEOUT,
+    CONF_KEEP_AWAKE_INTERVAL,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
     CONF_PRESET_HEIGHT,
     CONF_PRESET_NAME,
     DEFAULT_IDLE_TIMEOUT,
+    DEFAULT_KEEP_AWAKE_INTERVAL,
     FALLBACK_MAX_MM,
     FALLBACK_MIN_MM,
+    MODE_ALWAYS,
+    MODE_KEEP_AWAKE,
+    MODE_ON_DEMAND,
     PRESET_COUNT,
     RECONNECT_DELAY,
+    STALE_CHECK_INTERVAL,
+    STALE_TIMEOUT,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -61,8 +69,21 @@ class DeskCoordinator:
     # -- options -------------------------------------------------------------------
 
     @property
+    def connection_mode(self) -> str:
+        if mode := self.entry.options.get(CONF_CONNECTION_MODE):
+            return mode
+        # Options saved before 0.1.5 had a boolean instead.
+        return MODE_ALWAYS if self.entry.options.get(CONF_ALWAYS_CONNECTED) else MODE_ON_DEMAND
+
+    @property
     def always_connected(self) -> bool:
-        return self.entry.options.get(CONF_ALWAYS_CONNECTED, False)
+        return self.connection_mode == MODE_ALWAYS
+
+    @property
+    def keep_awake_interval(self) -> timedelta:
+        return timedelta(
+            minutes=self.entry.options.get(CONF_KEEP_AWAKE_INTERVAL, DEFAULT_KEEP_AWAKE_INTERVAL)
+        )
 
     @property
     def idle_timeout(self) -> float:
@@ -139,6 +160,17 @@ class DeskCoordinator:
                 self.hass, self._on_unavailable, self.address, connectable=True
             )
         )
+        entry.async_on_unload(
+            async_track_time_interval(
+                self.hass, self._async_check_stale, timedelta(seconds=STALE_CHECK_INTERVAL)
+            )
+        )
+        if self.connection_mode == MODE_KEEP_AWAKE:
+            entry.async_on_unload(
+                async_track_time_interval(
+                    self.hass, self._async_keep_awake, self.keep_awake_interval
+                )
+            )
         # Read height, limits and presets once; in always-connected mode this stays up.
         entry.async_create_background_task(
             self.hass, self._async_try_connect(), f"{entry.title} initial connect"
@@ -221,6 +253,24 @@ class DeskCoordinator:
             return  # the next advertisement schedules a new attempt
         if not await self._async_try_connect():
             self._schedule_reconnect()
+
+    async def _async_keep_awake(self, _now: datetime) -> None:
+        """Connect briefly so the desk's standby timer (~60 min) restarts."""
+        if self._shutdown or self.desk.connected or self._motions:
+            return
+        if not bluetooth.async_address_present(self.hass, self.address, connectable=True):
+            _LOGGER.debug("%s: keep awake: not advertising, skipped", self.entry.title)
+            return
+        _LOGGER.debug("%s: keep awake", self.entry.title)
+        await self._async_try_connect()  # released again after the idle timeout
+
+    async def _async_check_stale(self, _now: datetime) -> None:
+        """Close a connection that looks open but carries no data any more."""
+        age = self.desk.last_frame_age
+        if self._shutdown or not self.desk.connected or age is None or age < STALE_TIMEOUT:
+            return
+        _LOGGER.info("%s: no data for %.0f s, closing the stale connection", self.entry.title, age)
+        await self.desk.disconnect()  # always-connected mode reconnects from the callback
 
     @callback
     def _schedule_idle_disconnect(self) -> None:

@@ -26,7 +26,8 @@
           "min_height": "Lowest height",
           "max_height": "Highest height",
           "idle_timeout": "Disconnect after idle",
-          "always_connected": "Always connected",
+          "connection_mode": "Connection",
+          "keep_awake_interval": "Keep awake every",
           "expose_cover": "Show as cover",
           "preset_1_name": "Preset 1 name",
           "preset_2_name": "Preset 2 name",
@@ -41,7 +42,8 @@
           "min_height": "Height for cover position 0 (closed). Empty: the desk's lower limit.",
           "max_height": "Height for cover position 100 (open). Empty: the desk's upper limit.",
           "idle_timeout": "Seconds to keep the connection after the last move, then release it so the vendor app can connect.",
-          "always_connected": "Keep the connection open: live height updates (also when the handset moves the desk), and the desk does not go into standby after about an hour idle. The vendor app cannot connect meanwhile.",
+          "connection_mode": "On demand: connect for each command, release after the idle time (the vendor app can connect in between; after about an hour without activity the desk sleeps until a handset key is pressed). Keep awake: on demand, plus a short connection at the interval below so the desk never goes to sleep. Always connected: hold the connection for live height updates and the quickest response; the vendor app cannot connect.",
+          "keep_awake_interval": "Keep awake mode only. Must stay below the desk's standby time of about 60 minutes.",
           "expose_cover": "Adds a cover entity with a position slider. Off by default: \"close all covers\" (in an area or the whole home) would also move the desk."
         }
       }
@@ -75,6 +77,15 @@
     "sensor": {
       "height": {
         "name": "Height"
+      }
+    }
+  },
+  "selector": {
+    "connection_mode": {
+      "options": {
+        "on_demand": "On demand",
+        "keep_awake": "Keep awake",
+        "always_connected": "Always connected"
       }
     }
   }

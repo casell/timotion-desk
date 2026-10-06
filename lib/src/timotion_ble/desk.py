@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import time
 from collections.abc import Awaitable, Callable
 from typing import Literal
 
@@ -44,6 +45,7 @@ class TimotionDesk:
         self._motion: asyncio.Task[Result] | None = None
         self._got_9d = asyncio.Event()
         self._got_status = asyncio.Event()
+        self._last_frame: float | None = None  # monotonic time of the last valid frame
 
     # -- state ---------------------------------------------------------------------
 
@@ -79,6 +81,15 @@ class TimotionDesk:
     def config(self) -> p.ConfigFrame | None:
         """Limits, handset presets and raw stored values, once the desk has sent them."""
         return self._config
+
+    @property
+    def last_frame_age(self) -> float | None:
+        """Seconds since the last valid frame (None before the first one).
+
+        While connected the desk sends about 10 frames per second, so a growing age on a
+        connection that looks open means the link is dead (e.g. stuck in a proxy).
+        """
+        return None if self._last_frame is None else time.monotonic() - self._last_frame
 
     @property
     def handshake_reply(self) -> bytes | None:
@@ -163,6 +174,8 @@ class TimotionDesk:
         if data[:1] == b"\x9d":
             self._got_9d.set()
         frame = p.parse_frame(bytes(data))
+        if frame is not None:
+            self._last_frame = time.monotonic()
         if isinstance(frame, p.StatusFrame):
             self._got_status.set()
             if frame != self._status:

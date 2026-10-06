@@ -50,9 +50,15 @@ You can also add it via *Settings → Devices & services → Add integration →
   the travel limits configured on the desk.
 - **Disconnect after idle**: seconds to keep the connection after the last move
   (default 60).
-- **Always connected**: keep the connection open. Gives live height updates (also when
-  the handset moves the desk) and keeps the desk out of standby (see below), but the
-  vendor app cannot connect meanwhile.
+- **Connection**:
+  - *On demand* (default): connect for each command and release the desk after the idle
+    time, so the vendor app can connect in between. After about an hour without activity
+    the desk goes to sleep until a handset key is pressed.
+  - *Keep awake*: on demand, plus a short connection every few minutes (**Keep awake
+    every**, 10–55 min, default 45) so the desk never goes to sleep. Commands take a second
+    or two to connect, as on demand.
+  - *Always connected*: hold the connection. Live height updates (also for handset
+    moves), the quickest response, and no standby, but the vendor app cannot connect.
 - **Show as cover**: add the cover entity. Off by default, because actions on all covers
   (of an area, or of the whole home) would otherwise move the desk with the blinds.
 - **Presets**: up to four named heights, one button each. The vendor app's presets live
@@ -69,8 +75,9 @@ You can also add it via *Settings → Devices & services → Add integration →
 - **Standby after about an hour.** About 60 minutes after its last activity the desk
   stops advertising and cannot be reached over Bluetooth at all, not even by the vendor
   app. Only a key press on the handset wakes it. Home Assistant then reports that the
-  desk is probably in standby. An open connection keeps it awake: turn on *Always
-  connected* if the desk must be controllable from Home Assistant at any time.
+  desk is probably in standby. A connection resets that timer: use the *Keep awake* or
+  *Always connected* mode if the desk must be controllable from Home Assistant at any
+  time.
 - **Bluetooth proxies** must support connections: a local adapter or an ESPHome
   Bluetooth proxy with `bluetooth_proxy: active: true` works. Shelly devices cannot
   connect, even with their "active" scanning mode enabled, so they cannot control the
@@ -82,6 +89,11 @@ You can also add it via *Settings → Devices & services → Add integration →
   a Home Assistant move aborts that move.
 - If the connection drops mid-move, the desk keeps going for about 1.2 s (≈ 50 mm)
   before its own watchdog stops it.
+- **Stuck connections.** A Bluetooth proxy can keep a link to the desk open after Home
+  Assistant lost it (restarts, Wi-Fi hiccups); the desk then stops advertising and looks
+  gone. The integration closes any connection that carries no data for 15 s and
+  reconnects if needed. If the desk still seems gone, unplugging it for a moment clears
+  the link.
 
 ## Development
 

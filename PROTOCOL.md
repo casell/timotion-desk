@@ -70,7 +70,12 @@ hears it, nothing can connect, and the vendor app cannot reach it either. There 
 wake-up: only a handset key press brings it back (it advertises again within seconds).
 Measured: a move worked 39.5 min after the last handset press; 60 min after the last BLE
 disconnect the advertisements stopped. An open connection prevents standby: with a
-connection held (and nothing sent) the desk was still controllable after 71 min.
+connection held (and nothing sent) the desk was still controllable after 71 min. The
+timer restarts at the end of a connection; whether a short connection without any motion
+also restarts it is assumed (keep-awake mode relies on it) but not separately verified.
+While connected the desk sends about 10 frames per second; a connection that looks open
+but carries nothing for several seconds is dead (seen with Bluetooth proxies, which can
+hold a link the host lost: the desk then stops advertising until the link is closed).
 On a warm reconnect frames arrive without handshake and motion works without init;
 cold state untested, so always send both (cheap).
 Handset vs BLE: while a BLE go-to streams, a handset key shows in ST (key bit) but is

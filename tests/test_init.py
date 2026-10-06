@@ -28,11 +28,15 @@ from pytest_homeassistant_custom_component.common import async_fire_time_changed
 
 from custom_components.timotion_desk.const import (
     CONF_ALWAYS_CONNECTED,
+    CONF_CONNECTION_MODE,
     CONF_EXPOSE_COVER,
     CONF_IDLE_TIMEOUT,
+    CONF_KEEP_AWAKE_INTERVAL,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
     DOMAIN,
+    MODE_ALWAYS,
+    MODE_KEEP_AWAKE,
 )
 
 COVER_ID = "cover.stand_up_1234"
@@ -175,7 +179,7 @@ async def test_stays_connected_while_moving(
 async def test_always_connected(
     hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
 ):
-    desk = await setup(hass, entry, {CONF_ALWAYS_CONNECTED: True})
+    desk = await setup(hass, entry, {CONF_CONNECTION_MODE: MODE_ALWAYS})
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=600))
     await hass.async_block_till_done()
     assert desk.connected
@@ -185,6 +189,74 @@ async def test_always_connected(
     async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=11))
     await hass.async_block_till_done()
     assert desk.connected
+
+
+async def test_always_connected_legacy_option(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+):
+    """The boolean option saved before 0.1.5 still means always connected."""
+    desk = await setup(hass, entry, {CONF_ALWAYS_CONNECTED: True})
+    assert entry.runtime_data.connection_mode == MODE_ALWAYS
+    async_fire_time_changed(hass, dt_util.utcnow() + timedelta(seconds=600))
+    await hass.async_block_till_done()
+    assert desk.connected
+
+
+async def test_keep_awake(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry, freezer
+):
+    desk = await setup(
+        hass,
+        entry,
+        {
+            CONF_CONNECTION_MODE: MODE_KEEP_AWAKE,
+            CONF_KEEP_AWAKE_INTERVAL: 10,
+            CONF_IDLE_TIMEOUT: 30,
+        },
+    )
+
+    async def advance(delta: timedelta) -> None:
+        freezer.tick(delta)
+        async_fire_time_changed(hass)
+        await hass.async_block_till_done()
+
+    await advance(timedelta(seconds=31))
+    assert not desk.connected  # released after the idle timeout, like on demand
+    await advance(timedelta(minutes=9, seconds=30))
+    assert desk.connected and desk.calls.count("connect") == 2  # keep-awake connection
+    await advance(timedelta(seconds=31))
+    assert not desk.connected  # and released again
+    await advance(timedelta(minutes=10))
+    assert desk.calls.count("connect") == 3  # every interval
+
+
+async def test_keep_awake_skips_silent_desk(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+):
+    desk = await setup(hass, entry, {CONF_CONNECTION_MODE: MODE_KEEP_AWAKE})
+    await desk.disconnect()
+    with patch("homeassistant.components.bluetooth.async_address_present", return_value=False):
+        async_fire_time_changed(hass, dt_util.utcnow() + timedelta(minutes=46))
+        await hass.async_block_till_done()
+    assert desk.calls.count("connect") == 1  # only the initial one
+
+
+async def test_stale_connection_closed(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+):
+    desk = await setup(hass, entry, {CONF_CONNECTION_MODE: MODE_ALWAYS})
+    now = dt_util.utcnow()
+    desk.last_frame_age = 3.0  # live link: frames keep coming
+    async_fire_time_changed(hass, now + timedelta(seconds=6))
+    await hass.async_block_till_done()
+    assert desk.connected
+    desk.last_frame_age = 20.0  # looks connected, but nothing arrives
+    async_fire_time_changed(hass, now + timedelta(seconds=12))
+    await hass.async_block_till_done()
+    assert desk.calls.count("disconnect") == 1
+    async_fire_time_changed(hass, now + timedelta(seconds=24))  # reconnect delay
+    await hass.async_block_till_done()
+    assert desk.connected and desk.calls.count("connect") == 2
 
 
 @pytest.mark.parametrize(

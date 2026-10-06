@@ -270,3 +270,13 @@ async def test_disconnect(fake):
     desk = await connected(fake)
     await desk.disconnect()
     assert not desk.connected
+
+
+async def test_last_frame_age(fake):
+    desk = TimotionDesk(Device())
+    assert desk.last_frame_age is None
+    await desk.connect()
+    assert desk.last_frame_age < 0.5  # the simulated desk streams status frames
+    fake.task.cancel()  # the link goes silent
+    await asyncio.sleep(0.2)
+    assert desk.last_frame_age >= 0.2

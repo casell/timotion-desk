@@ -6,9 +6,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.timotion_desk.const import (
-    CONF_ALWAYS_CONNECTED,
+    CONF_CONNECTION_MODE,
     CONF_EXPOSE_COVER,
     CONF_IDLE_TIMEOUT,
+    CONF_KEEP_AWAKE_INTERVAL,
     CONF_MAX_HEIGHT,
     CONF_MIN_HEIGHT,
     DOMAIN,
@@ -82,7 +83,7 @@ async def test_options(hass: HomeAssistant, entry) -> None:
             CONF_MIN_HEIGHT: 110,
             CONF_MAX_HEIGHT: 80,
             CONF_IDLE_TIMEOUT: 60,
-            CONF_ALWAYS_CONNECTED: False,
+            CONF_CONNECTION_MODE: "on_demand",
         },
     )
     assert result["errors"] == {"base": "min_above_max"}
@@ -90,7 +91,8 @@ async def test_options(hass: HomeAssistant, entry) -> None:
         CONF_MIN_HEIGHT: 75,
         CONF_MAX_HEIGHT: 120,
         CONF_IDLE_TIMEOUT: 30,
-        CONF_ALWAYS_CONNECTED: True,
+        CONF_CONNECTION_MODE: "keep_awake",
+        CONF_KEEP_AWAKE_INTERVAL: 40,
         CONF_EXPOSE_COVER: True,
         "preset_1_name": "Sit",
         "preset_1_height": 78,

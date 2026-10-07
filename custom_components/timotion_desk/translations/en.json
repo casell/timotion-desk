@@ -88,5 +88,11 @@
         "always_connected": "Always connected"
       }
     }
+  },
+  "issues": {
+    "unreachable": {
+      "title": "{name} is not reachable over Bluetooth",
+      "description": "Home Assistant has not heard {name} for several minutes, although its connection mode should keep it awake.\n\nIf the desk still moves with its handset, its Bluetooth module has probably hung: unplug the desk for about 10 seconds, then plug it back in. Otherwise check that a Bluetooth adapter or proxy that supports connections is in range and switched on (Settings → Bluetooth).\n\nThis notice disappears as soon as the desk is heard again."
+    }
   }
 }

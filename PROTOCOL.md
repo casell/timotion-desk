@@ -76,6 +76,11 @@ also restarts it is assumed (keep-awake mode relies on it) but not separately ve
 While connected the desk sends about 10 frames per second; a connection that looks open
 but carries nothing for several seconds is dead (seen with Bluetooth proxies, which can
 hold a link the host lost: the desk then stops advertising until the link is closed).
+The BLE module can also hang: seen twice (both times used through ESPHome proxies, last
+good connection ~45 min of keep-awake connections, around a proxy being switched off).
+The handset still works, but the desk does not advertise, a handset key does not bring
+it back, restarting the proxies does not either; only a power cycle does (it advertises
+again within seconds of being plugged back in).
 On a warm reconnect frames arrive without handshake and motion works without init;
 cold state untested, so always send both (cheap).
 Handset vs BLE: while a BLE go-to streams, a handset key shows in ST (key bit) but is

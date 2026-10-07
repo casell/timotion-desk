@@ -19,7 +19,7 @@
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/casell/timotion-desk/issues",
   "requirements": [
-    "timotion-ble@https://github.com/casell/timotion-desk/releases/download/v0.1.5/timotion_ble-0.1.5-py3-none-any.whl"
+    "timotion-ble@https://github.com/casell/timotion-desk/releases/download/v0.1.6/timotion_ble-0.1.6-py3-none-any.whl"
   ],
-  "version": "0.1.5"
+  "version": "0.1.6"
 }

@@ -89,11 +89,13 @@ You can also add it via *Settings → Devices & services → Add integration →
   a Home Assistant move aborts that move.
 - If the connection drops mid-move, the desk keeps going for about 1.2 s (≈ 50 mm)
   before its own watchdog stops it.
-- **Stuck connections.** A Bluetooth proxy can keep a link to the desk open after Home
-  Assistant lost it (restarts, Wi-Fi hiccups); the desk then stops advertising and looks
-  gone. The integration closes any connection that carries no data for 15 s and
-  reconnects if needed. If the desk still seems gone, unplugging it for a moment clears
-  the link.
+- **The desk's Bluetooth can hang.** Seen twice while the desk was used through ESPHome
+  proxies: the handset keeps working, but the desk stops advertising and nothing can
+  connect, not even after a handset key press or a proxy restart. Unplugging the desk for
+  about 10 seconds brings it back. In *Keep awake* and *Always connected* mode Home
+  Assistant shows a repair notice when the desk has not been heard for 5 minutes. The
+  integration also closes any connection that carries no data for 15 s (a link a proxy
+  kept after Home Assistant lost it) and reconnects if needed.
 
 ## Development
 

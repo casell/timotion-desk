@@ -22,6 +22,7 @@ from homeassistant.const import ATTR_ENTITY_ID, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.loader import async_get_integration
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import async_fire_time_changed
@@ -38,6 +39,8 @@ from custom_components.timotion_desk.const import (
     MODE_ALWAYS,
     MODE_KEEP_AWAKE,
 )
+
+from .conftest import service_info
 
 COVER_ID = "cover.stand_up_1234"
 HEIGHT_ID = "sensor.stand_up_1234_height"
@@ -303,3 +306,31 @@ async def test_brand_icon(hass: HomeAssistant):
     assert integration.has_branding
     brand = integration.file_path / "brand"
     assert {p.name for p in brand.iterdir()} >= {"icon.png", "icon@2x.png"}
+
+
+@pytest.mark.parametrize(("mode", "expect_issue"), [(MODE_KEEP_AWAKE, True), ("on_demand", False)])
+async def test_unreachable_issue(
+    hass: HomeAssistant,
+    enable_bluetooth,
+    desk_present,
+    fake_desk,
+    entry,
+    freezer,
+    mode,
+    expect_issue,
+):
+    desk = await setup(hass, entry, {CONF_CONNECTION_MODE: mode})
+    await desk.disconnect()
+    issue_id = f"unreachable_{entry.entry_id}"
+    silent = MagicMock(time=bluetooth.MONOTONIC_TIME() - 600, source="AA:AA:AA:AA:AA:AA", rssi=-70)
+    with patch("homeassistant.components.bluetooth.async_last_service_info", return_value=silent):
+        freezer.tick(timedelta(minutes=6))
+        async_fire_time_changed(hass)
+        await hass.async_block_till_done()
+    issue = ir.async_get(hass).async_get_issue(DOMAIN, issue_id)
+    assert (issue is not None) is expect_issue
+    if expect_issue:
+        assert issue.translation_key == "unreachable"
+        # The desk is heard again: the notice goes away.
+        entry.runtime_data._on_advertisement(service_info(), None)
+        assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is None

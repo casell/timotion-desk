@@ -7,6 +7,7 @@ app), and tells the entities when to refresh.
 """
 
 import logging
+import time
 from collections.abc import Callable, Coroutine
 from datetime import datetime, timedelta
 from typing import Any
@@ -16,6 +17,7 @@ from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from timotion_ble import TimotionDesk, TimotionError
 
@@ -30,6 +32,7 @@ from .const import (
     CONF_PRESET_NAME,
     DEFAULT_IDLE_TIMEOUT,
     DEFAULT_KEEP_AWAKE_INTERVAL,
+    DOMAIN,
     FALLBACK_MAX_MM,
     FALLBACK_MIN_MM,
     MODE_ALWAYS,
@@ -39,6 +42,7 @@ from .const import (
     RECONNECT_DELAY,
     STALE_CHECK_INTERVAL,
     STALE_TIMEOUT,
+    UNREACHABLE_AFTER,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,6 +69,9 @@ class DeskCoordinator:
         self._motions = 0  # running motion tasks
         self._shutdown = False
         self._connect_failed = False  # log the first failure only
+        self._was_connected = False
+        self._started = time.monotonic()
+        self._unreachable = False  # repair issue raised
 
     # -- options -------------------------------------------------------------------
 
@@ -178,6 +185,7 @@ class DeskCoordinator:
 
     async def async_shutdown(self) -> None:
         self._shutdown = True
+        ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
         self._cancel_idle()
         if self._reconnect_unsub:
             self._reconnect_unsub()
@@ -186,11 +194,31 @@ class DeskCoordinator:
 
     # -- callbacks -----------------------------------------------------------------
 
+    @property
+    def _issue_id(self) -> str:
+        return f"unreachable_{self.entry.entry_id}"
+
     @callback
     def _on_desk_update(self) -> None:
+        if self.desk.connected != self._was_connected:
+            self._was_connected = self.desk.connected
+            if self._was_connected:
+                _LOGGER.debug("%s: connected via %s", self.entry.title, self._via())
+                self._clear_unreachable()
+            else:
+                _LOGGER.debug("%s: disconnected", self.entry.title)
         if not self.desk.connected and self.always_connected:
             self._schedule_reconnect()
         self._notify()
+
+    def _via(self) -> str:
+        """The adapter or proxy that last heard the desk (connections go through it)."""
+        info = bluetooth.async_last_service_info(self.hass, self.address, connectable=True)
+        if info is None:
+            return "unknown scanner"
+        scanner = bluetooth.async_scanner_by_source(self.hass, info.source)
+        name = scanner.name if scanner else info.source
+        return f"{name} (rssi {info.rssi})"
 
     @callback
     def _on_advertisement(
@@ -198,6 +226,7 @@ class DeskCoordinator:
     ) -> None:
         # Follow the adapter or proxy that currently sees the desk best.
         self.desk.set_ble_device(service_info.device)
+        self._clear_unreachable()
         if self.always_connected and not self.desk.connected:
             self._schedule_reconnect(0)
         self._notify()
@@ -259,18 +288,54 @@ class DeskCoordinator:
         if self._shutdown or self.desk.connected or self._motions:
             return
         if not bluetooth.async_address_present(self.hass, self.address, connectable=True):
-            _LOGGER.debug("%s: keep awake: not advertising, skipped", self.entry.title)
+            # Reported by _check_unreachable once the silence lasts.
+            _LOGGER.info("%s: keep awake skipped: desk not advertising", self.entry.title)
             return
         _LOGGER.debug("%s: keep awake", self.entry.title)
         await self._async_try_connect()  # released again after the idle timeout
 
     async def _async_check_stale(self, _now: datetime) -> None:
-        """Close a connection that looks open but carries no data any more."""
+        """Close a dead connection; report a desk that went silent when it should not."""
+        self._check_unreachable()
         age = self.desk.last_frame_age
         if self._shutdown or not self.desk.connected or age is None or age < STALE_TIMEOUT:
             return
         _LOGGER.info("%s: no data for %.0f s, closing the stale connection", self.entry.title, age)
         await self.desk.disconnect()  # always-connected mode reconnects from the callback
+
+    @callback
+    def _clear_unreachable(self) -> None:
+        if self._unreachable:
+            self._unreachable = False
+            _LOGGER.info("%s: reachable again", self.entry.title)
+            ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
+
+    @callback
+    def _check_unreachable(self) -> None:
+        if self.connection_mode == MODE_ON_DEMAND or self.desk.connected or self._shutdown:
+            return  # on demand: silence after an hour idle is normal standby
+        if time.monotonic() - self._started < UNREACHABLE_AFTER:
+            return  # give the scanners time to hear the desk after startup
+        silent = self._silent_for()
+        if silent < UNREACHABLE_AFTER:
+            return
+        if self._unreachable:
+            return
+        self._unreachable = True
+        _LOGGER.warning(
+            "%s: not heard by any connectable Bluetooth adapter or proxy for %.0f min",
+            self.entry.title,
+            min(silent, 10**6) / 60,
+        )
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            self._issue_id,
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key="unreachable",
+            translation_placeholders={"name": self.entry.title},
+        )
 
     @callback
     def _schedule_idle_disconnect(self) -> None:

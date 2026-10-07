@@ -30,3 +30,7 @@ RECONNECT_DELAY = 10  # s, always-connected mode
 # (typically stuck in a Bluetooth proxy), which is then closed explicitly.
 STALE_TIMEOUT = 15  # s
 STALE_CHECK_INTERVAL = 5  # s
+# In keep-awake / always-connected mode the desk should never go silent. If it is not
+# connected and not heard for this long, raise a repair issue: its Bluetooth module can
+# hang (handset still works, radio silent) and only a power cycle brings it back.
+UNREACHABLE_AFTER = 5 * 60  # s

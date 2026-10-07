@@ -48,15 +48,15 @@ You can also add it via *Settings → Devices & services → Add integration →
 
 - **Lowest / highest height**: the range of the cover and the target number. Empty means
   the travel limits configured on the desk.
-- **Disconnect after idle**: seconds to keep the connection after the last move
-  (default 60).
+- **Disconnect after idle**: seconds to keep the connection after the last move, so
+  follow-up commands are instant (default 20).
 - **Connection**:
   - *On demand* (default): connect for each command and release the desk after the idle
     time, so the vendor app can connect in between. After about an hour without activity
     the desk goes to sleep until a handset key is pressed.
-  - *Keep awake*: on demand, plus a short connection every few minutes (**Keep awake
-    every**, 10–55 min, default 45) so the desk never goes to sleep. Commands take a second
-    or two to connect, as on demand.
+  - *Keep awake*: on demand, plus a connection of a few seconds every **Keep awake
+    every** minutes (10–55, default 45) so the desk never goes to sleep. Commands take a
+    second or two to connect, as on demand.
   - *Always connected*: hold the connection. Live height updates (also for handset
     moves), the quickest response, and no standby, but the vendor app cannot connect.
 - **Show as cover**: add the cover entity. Off by default, because actions on all covers

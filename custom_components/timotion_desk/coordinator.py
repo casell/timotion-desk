@@ -72,6 +72,7 @@ class DeskCoordinator:
         self._was_connected = False
         self._started = time.monotonic()
         self._unreachable = False  # repair issue raised
+        self._last_command = 0.0  # monotonic time of the last user command
 
     # -- options -------------------------------------------------------------------
 
@@ -292,7 +293,18 @@ class DeskCoordinator:
             _LOGGER.info("%s: keep awake skipped: desk not advertising", self.entry.title)
             return
         _LOGGER.debug("%s: keep awake", self.entry.title)
-        await self._async_try_connect()  # released again after the idle timeout
+        started = time.monotonic()
+        try:
+            await self.desk.connect()  # returns once the first status frame arrived
+        except CONNECT_ERRORS as err:
+            _LOGGER.info("%s: keep awake failed: %s", self.entry.title, err)
+            return
+        if self._last_command >= started:
+            # A command arrived meanwhile: keep the connection for its idle window.
+            self._schedule_idle_disconnect()
+            return
+        # The connection itself restarted the standby timer: release the desk at once.
+        await self.desk.disconnect()
 
     async def _async_check_stale(self, _now: datetime) -> None:
         """Close a dead connection; report a desk that went silent when it should not."""
@@ -363,6 +375,7 @@ class DeskCoordinator:
 
     async def async_move(self, motion: Callable[[], Coroutine[Any, Any, Any]]) -> None:
         """Connect (raising on failure), then run the motion in the background."""
+        self._last_command = time.monotonic()
         await self._async_ensure_connected()
         self._motions += 1
         self.entry.async_create_background_task(
@@ -383,6 +396,7 @@ class DeskCoordinator:
         await self.async_move(lambda: self.desk.move_to(mm))
 
     async def async_stop(self) -> None:
+        self._last_command = time.monotonic()
         if not self.desk.connected:
             return
         try:

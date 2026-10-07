@@ -21,7 +21,7 @@ PRESET_COUNT = 4
 CONF_PRESET_NAME = "preset_{}_name"
 CONF_PRESET_HEIGHT = "preset_{}_height"  # cm
 
-DEFAULT_IDLE_TIMEOUT = 60
+DEFAULT_IDLE_TIMEOUT = 20
 # Used until the desk has reported its limits.
 FALLBACK_MIN_MM = 650
 FALLBACK_MAX_MM = 1300

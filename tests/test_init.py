@@ -1,3 +1,4 @@
+import time
 from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
@@ -226,11 +227,44 @@ async def test_keep_awake(
     await advance(timedelta(seconds=31))
     assert not desk.connected  # released after the idle timeout, like on demand
     await advance(timedelta(minutes=9, seconds=30))
-    assert desk.connected and desk.calls.count("connect") == 2  # keep-awake connection
-    await advance(timedelta(seconds=31))
-    assert not desk.connected  # and released again
+    # Keep-awake connection, released right away (not after the idle timeout).
+    assert desk.calls[-2:] == ["connect", "disconnect"] and not desk.connected
     await advance(timedelta(minutes=10))
     assert desk.calls.count("connect") == 3  # every interval
+    assert not desk.connected
+
+
+async def test_keep_awake_keeps_a_command_connection(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry, freezer
+):
+    """A command that arrives while a keep-awake connection is set up is not cut off."""
+    desk = await setup(
+        hass,
+        entry,
+        {
+            CONF_CONNECTION_MODE: MODE_KEEP_AWAKE,
+            CONF_KEEP_AWAKE_INTERVAL: 10,
+            CONF_IDLE_TIMEOUT: 30,
+        },
+    )
+    coordinator = entry.runtime_data
+    await desk.disconnect()
+    connect = desk.connect
+
+    async def connect_while_command_arrives() -> None:
+        await connect()
+        freezer.tick(timedelta(seconds=1))
+        coordinator._last_command = time.monotonic()  # as async_move / async_stop do
+
+    desk.connect = connect_while_command_arrives
+    freezer.tick(timedelta(minutes=10))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+    assert desk.connected  # kept for the command's idle window
+    freezer.tick(timedelta(seconds=31))
+    async_fire_time_changed(hass)
+    await hass.async_block_till_done()
+    assert not desk.connected
 
 
 async def test_keep_awake_skips_silent_desk(

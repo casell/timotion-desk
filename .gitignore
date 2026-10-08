@@ -7,3 +7,4 @@ dist/
 .venv-ha/
 private/
 CLAUDE.md
+/home-assistant*.log

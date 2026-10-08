@@ -368,3 +368,77 @@ async def test_unreachable_issue(
         # The desk is heard again: the notice goes away.
         entry.runtime_data._on_advertisement(service_info(), None)
         assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is None
+
+
+def passive_only(conn_age: float = 600, passive_age: float = 1):
+    """async_last_service_info stand-in: heard recently only by non-connectable scanners."""
+
+    def last_service_info(_hass, _address, connectable=True):
+        age = conn_age if connectable else passive_age
+        return MagicMock(time=bluetooth.MONOTONIC_TIME() - age, source="C4:D8:D5:00:00:01")
+
+    return patch(
+        "homeassistant.components.bluetooth.async_last_service_info",
+        side_effect=last_service_info,
+    )
+
+
+async def test_passive_only_issue_in_any_mode(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry, freezer
+):
+    """Heard only by scanners that cannot connect is never normal, even on demand."""
+    desk = await setup(hass, entry, {CONF_CONNECTION_MODE: "on_demand"})
+    await desk.disconnect()
+    with passive_only():
+        freezer.tick(timedelta(minutes=6))
+        async_fire_time_changed(hass)
+        await hass.async_block_till_done()
+    issue = ir.async_get(hass).async_get_issue(DOMAIN, f"unreachable_{entry.entry_id}")
+    assert issue is not None and issue.translation_key == "no_connectable_scanner"
+    entry.runtime_data._on_advertisement(service_info(), None)  # a connectable scanner again
+    assert ir.async_get(hass).async_get_issue(DOMAIN, f"unreachable_{entry.entry_id}") is None
+
+
+async def test_connect_error_names_passive_only_scanners(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+):
+    desk = await setup(hass, entry)
+    await desk.disconnect()
+    desk.fail_connect = True
+    with passive_only(), pytest.raises(HomeAssistantError, match="cannot connect"):
+        await hass.services.async_call(
+            NUMBER, SERVICE_SET_VALUE, {ATTR_ENTITY_ID: TARGET_ID, ATTR_VALUE: 100}, blocking=True
+        )
+
+
+async def test_setup_reports_passive_only_after_grace(
+    hass: HomeAssistant, enable_bluetooth, fake_desk, entry, freezer
+):
+    issue_id = f"unreachable_{entry.entry_id}"
+    no_device = patch(
+        "homeassistant.components.bluetooth.async_ble_device_from_address", return_value=None
+    )
+    with no_device, passive_only():
+        await hass.config_entries.async_setup(entry.entry_id)
+        assert entry.state is ConfigEntryState.SETUP_RETRY
+        assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is None  # grace period
+        # Setup retries with backoff (5, 10, 20, 40, 80 s...): run 10 minutes of them.
+        for _ in range(20):
+            freezer.tick(timedelta(seconds=30))
+            async_fire_time_changed(hass)
+            await hass.async_block_till_done()
+    issue = ir.async_get(hass).async_get_issue(DOMAIN, issue_id)
+    assert issue is not None and issue.translation_key == "no_connectable_scanner"
+    # A connectable scanner hears the desk again: setup succeeds and the notice goes.
+    with (
+        patch(
+            "homeassistant.components.bluetooth.async_ble_device_from_address",
+            return_value=service_info().device,
+        ),
+        patch("homeassistant.components.bluetooth.async_address_present", return_value=True),
+    ):
+        freezer.tick(timedelta(minutes=10))
+        async_fire_time_changed(hass)
+        await hass.async_block_till_done(wait_background_tasks=True)
+    assert entry.state is ConfigEntryState.LOADED
+    assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is None

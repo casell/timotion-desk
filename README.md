@@ -83,6 +83,9 @@ You can also add it via *Settings → Devices & services → Add integration →
   connect, even with their "active" scanning mode enabled, so they cannot control the
   desk. Home Assistant only offers the desk for setup once a connectable scanner hears
   it: in *Bluetooth → Advertisement monitor* the desk must show `connectable: true`.
+  If for 5 minutes the desk is heard only by scanners that cannot connect (a proxy is
+  off, or has stopped receiving), Home Assistant shows a repair notice saying so. Two
+  proxies near the desk give redundancy: either one can carry the connection.
 - **The handset wins when held.** The desk ignores a held handset key while Home
   Assistant is moving it, but takes the key over when the move ends, and a stop from
   Home Assistant cannot stop a move driven by a held key. Pressing a handset key during

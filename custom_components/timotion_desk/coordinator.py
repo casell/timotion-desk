@@ -54,6 +54,45 @@ CONNECT_ERRORS = (BleakError, TimotionError, TimeoutError)
 # into standby and stops advertising; only a handset key wakes it, nothing over BLE does.
 STANDBY_SILENCE = 30  # s without advertisements before a failed connect means standby
 
+# Why HA cannot reach an awake-looking desk, as a repair issue translation key.
+ISSUE_UNREACHABLE = "unreachable"  # heard by nobody: hung Bluetooth module, or standby
+ISSUE_NO_CONNECTABLE = "no_connectable_scanner"  # heard only by scanners that cannot connect
+
+
+def silent_for(hass: HomeAssistant, address: str, *, connectable: bool) -> float:
+    """Seconds since the desk was last heard (inf if never).
+
+    connectable=False covers every scanner, including passive ones such as Shelly
+    devices, which hear the desk but can never connect to it.
+    """
+    info = bluetooth.async_last_service_info(hass, address, connectable=connectable)
+    return bluetooth.MONOTONIC_TIME() - info.time if info else float("inf")
+
+
+def heard_only_by_passive_scanners(hass: HomeAssistant, address: str) -> bool:
+    """The desk is advertising, but no scanner that can connect hears it."""
+    return (
+        silent_for(hass, address, connectable=True) > STANDBY_SILENCE
+        and silent_for(hass, address, connectable=False) <= STANDBY_SILENCE
+    )
+
+
+def issue_id(entry: ConfigEntry) -> str:
+    return f"unreachable_{entry.entry_id}"
+
+
+@callback
+def async_report_unreachable(hass: HomeAssistant, entry: ConfigEntry, key: str) -> None:
+    ir.async_create_issue(
+        hass,
+        DOMAIN,
+        issue_id(entry),
+        is_fixable=False,
+        severity=ir.IssueSeverity.WARNING,
+        translation_key=key,
+        translation_placeholders={"name": entry.title},
+    )
+
 
 class DeskCoordinator:
     """Owns the desk connection for one config entry."""
@@ -71,7 +110,7 @@ class DeskCoordinator:
         self._connect_failed = False  # log the first failure only
         self._was_connected = False
         self._started = time.monotonic()
-        self._unreachable = False  # repair issue raised
+        self._issue_key: str | None = None  # repair issue raised, by cause
         self._last_command = 0.0  # monotonic time of the last user command
 
     # -- options -------------------------------------------------------------------
@@ -186,7 +225,7 @@ class DeskCoordinator:
 
     async def async_shutdown(self) -> None:
         self._shutdown = True
-        ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
+        ir.async_delete_issue(self.hass, DOMAIN, issue_id(self.entry))
         self._cancel_idle()
         if self._reconnect_unsub:
             self._reconnect_unsub()
@@ -194,10 +233,6 @@ class DeskCoordinator:
         await self.desk.disconnect()
 
     # -- callbacks -----------------------------------------------------------------
-
-    @property
-    def _issue_id(self) -> str:
-        return f"unreachable_{self.entry.entry_id}"
 
     @callback
     def _on_desk_update(self) -> None:
@@ -258,6 +293,12 @@ class DeskCoordinator:
             await self.desk.connect()
         except CONNECT_ERRORS as err:
             self._schedule_idle_disconnect()
+            if heard_only_by_passive_scanners(self.hass, self.address):
+                raise HomeAssistantError(
+                    f"{self.entry.title} is only heard by Bluetooth scanners that cannot "
+                    "connect (such as Shelly devices). Check that a Bluetooth adapter or "
+                    "ESPHome proxy with active connections is on near the desk."
+                ) from err
             if self._silent_for() > STANDBY_SILENCE:
                 raise HomeAssistantError(
                     f"{self.entry.title} is not advertising, probably in standby (it sleeps "
@@ -267,8 +308,7 @@ class DeskCoordinator:
 
     def _silent_for(self) -> float:
         """Seconds since the last advertisement from the desk (inf if never seen)."""
-        info = bluetooth.async_last_service_info(self.hass, self.address, connectable=True)
-        return bluetooth.MONOTONIC_TIME() - info.time if info else float("inf")
+        return silent_for(self.hass, self.address, connectable=True)
 
     @callback
     def _schedule_reconnect(self, delay: float = RECONNECT_DELAY) -> None:
@@ -317,37 +357,36 @@ class DeskCoordinator:
 
     @callback
     def _clear_unreachable(self) -> None:
-        if self._unreachable:
-            self._unreachable = False
+        if self._issue_key:
+            self._issue_key = None
             _LOGGER.info("%s: reachable again", self.entry.title)
-            ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
+            ir.async_delete_issue(self.hass, DOMAIN, issue_id(self.entry))
 
     @callback
     def _check_unreachable(self) -> None:
-        if self.connection_mode == MODE_ON_DEMAND or self.desk.connected or self._shutdown:
-            return  # on demand: silence after an hour idle is normal standby
+        if self.desk.connected or self._shutdown:
+            return
         if time.monotonic() - self._started < UNREACHABLE_AFTER:
             return  # give the scanners time to hear the desk after startup
         silent = self._silent_for()
         if silent < UNREACHABLE_AFTER:
             return
-        if self._unreachable:
+        if heard_only_by_passive_scanners(self.hass, self.address):
+            key = ISSUE_NO_CONNECTABLE  # never normal, whatever the connection mode
+        elif self.connection_mode != MODE_ON_DEMAND:
+            key = ISSUE_UNREACHABLE  # on demand, silence after an hour idle is standby
+        else:
             return
-        self._unreachable = True
+        if key == self._issue_key:
+            return
+        self._issue_key = key
         _LOGGER.warning(
-            "%s: not heard by any connectable Bluetooth adapter or proxy for %.0f min",
+            "%s: not heard by any Bluetooth adapter or proxy that can connect for %.0f min%s",
             self.entry.title,
             min(silent, 10**6) / 60,
+            " (only by scanners that cannot connect)" if key == ISSUE_NO_CONNECTABLE else "",
         )
-        ir.async_create_issue(
-            self.hass,
-            DOMAIN,
-            self._issue_id,
-            is_fixable=False,
-            severity=ir.IssueSeverity.WARNING,
-            translation_key="unreachable",
-            translation_placeholders={"name": self.entry.title},
-        )
+        async_report_unreachable(self.hass, self.entry, key)
 
     @callback
     def _schedule_idle_disconnect(self) -> None:

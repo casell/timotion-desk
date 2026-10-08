@@ -93,6 +93,10 @@
     "unreachable": {
       "title": "{name} is not reachable over Bluetooth",
       "description": "Home Assistant has not heard {name} for several minutes, although its connection mode should keep it awake.\n\nIf the desk still moves with its handset, its Bluetooth module has probably hung: unplug the desk for about 10 seconds, then plug it back in. Otherwise check that a Bluetooth adapter or proxy that supports connections is in range and switched on (Settings → Bluetooth).\n\nThis notice disappears as soon as the desk is heard again."
+    },
+    "no_connectable_scanner": {
+      "title": "{name} is only heard by Bluetooth scanners that cannot connect",
+      "description": "Home Assistant hears {name} only through Bluetooth scanners that can listen but not connect (for example Shelly devices), so it cannot control the desk.\n\nCheck that a Bluetooth adapter or an ESPHome Bluetooth proxy with `bluetooth_proxy: active: true` is switched on near the desk, and that it actually receives: under Settings → Bluetooth its list of discovered devices should not be empty. Restarting a proxy that stopped receiving often helps.\n\nThis notice disappears as soon as a scanner that can connect hears the desk again."
     }
   }
 }

@@ -111,6 +111,7 @@ class DeskCoordinator:
         self._was_connected = False
         self._started = time.monotonic()
         self._issue_key: str | None = None  # repair issue raised, by cause
+        self._probing = False  # a liveness probe is in flight
         self._last_command = 0.0  # monotonic time of the last user command
 
     # -- options -------------------------------------------------------------------
@@ -352,7 +353,22 @@ class DeskCoordinator:
         age = self.desk.last_frame_age
         if self._shutdown or not self.desk.connected or age is None or age < STALE_TIMEOUT:
             return
-        _LOGGER.info("%s: no data for %.0f s, closing the stale connection", self.entry.title, age)
+        if self._probing or self._motions:
+            return  # a probe is running, or a motion stream keeps frames coming
+        # Silence is normal ~35 s after the last command: ask before closing.
+        self._probing = True
+        try:
+            alive = await self.desk.probe()
+        finally:
+            self._probing = False
+        if alive:
+            _LOGGER.debug("%s: silent for %.0f s, probe answered", self.entry.title, age)
+            return
+        _LOGGER.info(
+            "%s: no answer to a probe after %.0f s of silence, closing the dead connection",
+            self.entry.title,
+            age,
+        )
         await self.desk.disconnect()  # always-connected mode reconnects from the callback
 
     @callback

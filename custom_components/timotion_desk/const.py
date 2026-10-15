@@ -26,8 +26,10 @@ DEFAULT_IDLE_TIMEOUT = 20
 FALLBACK_MIN_MM = 650
 FALLBACK_MAX_MM = 1300
 RECONNECT_DELAY = 10  # s, always-connected mode
-# The desk sends ~10 frames/s while connected: this long without one means a dead link
-# (typically stuck in a Bluetooth proxy), which is then closed explicitly.
+# The desk only notifies for ~35 s after the last command it received, so silence alone
+# is normal on an idle connection. After this long without frames the link is probed
+# (one idle/stop frame, no motion) and closed only if nothing comes back: that catches a
+# dead link a Bluetooth proxy kept after Home Assistant lost it.
 STALE_TIMEOUT = 15  # s
 STALE_CHECK_INTERVAL = 5  # s
 # In keep-awake / always-connected mode the desk should never go silent. If it is not

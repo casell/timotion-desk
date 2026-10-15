@@ -23,6 +23,7 @@ GOTO_START_TIMEOUT = 2.0  # a go-to that never starts moving is done (already th
 MAX_MOTION = 30.0  # hard cap for any command stream
 ARRIVED_MM = 2
 STOP_FRAMES = 3
+PROBE_TIMEOUT = 5.0  # s to wait for frames after a probe; the desk answers in ~0.1 s
 
 Result = Literal["arrived", "timeout", "handset", "disconnected", "stopped"]
 
@@ -46,6 +47,7 @@ class TimotionDesk:
         self._got_9d = asyncio.Event()
         self._got_status = asyncio.Event()
         self._last_frame: float | None = None  # monotonic time of the last valid frame
+        self._got_frame = asyncio.Event()  # set on every valid frame, for probe()
 
     # -- state ---------------------------------------------------------------------
 
@@ -86,8 +88,8 @@ class TimotionDesk:
     def last_frame_age(self) -> float | None:
         """Seconds since the last valid frame (None before the first one).
 
-        While connected the desk sends about 10 frames per second, so a growing age on a
-        connection that looks open means the link is dead (e.g. stuck in a proxy).
+        The desk only notifies for ~35 s after the last command it received, so on an
+        idle connection this grows without the link being dead: use probe() to tell.
         """
         return None if self._last_frame is None else time.monotonic() - self._last_frame
 
@@ -176,6 +178,7 @@ class TimotionDesk:
         frame = p.parse_frame(bytes(data))
         if frame is not None:
             self._last_frame = time.monotonic()
+            self._got_frame.set()
         if isinstance(frame, p.StatusFrame):
             self._got_status.set()
             if frame != self._status:
@@ -210,6 +213,30 @@ class TimotionDesk:
     async def move_to(self, target_mm: int, timeout: float = MAX_MOTION) -> Result:
         """Go to `target_mm` (clamped to the desk's limits) and stop there."""
         return await self._run(lambda: self._goto(target_mm, timeout))
+
+    async def probe(self, timeout: float = PROBE_TIMEOUT) -> bool:
+        """Check that a silent connection is alive. Returns False for a dead link.
+
+        Sends ONE idle/stop frame, which does nothing on a desk at rest, and waits up to
+        `timeout` s for any valid frame back (the desk answers in ~0.1 s). Never sent
+        during a motion of ours: that stream keeps frames coming anyway.
+        """
+        if not self.connected:
+            return False
+        if self._motion is not None and not self._motion.done():
+            return True
+        self._got_frame.clear()
+        try:
+            await self._write(p.STOP)
+        except (BleakError, TimotionError) as err:
+            _LOGGER.debug("%s: probe write failed: %s", self.name, err)
+            return False
+        try:
+            await asyncio.wait_for(self._got_frame.wait(), timeout)
+        except TimeoutError:
+            _LOGGER.debug("%s: no frame within %.0f s of a probe", self.name, timeout)
+            return False
+        return True
 
     async def stop(self) -> None:
         """Cancel any motion and send stop frames. Cannot stop a held handset key."""

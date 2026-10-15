@@ -63,7 +63,15 @@ Stream interval: 300 ms and 800 ms streams moved the desk at full speed without 
 Speed ~38-40 mm/s. Latency: status echoes a new command after ~0.2-0.3 s, height starts
 changing after ~0.45-0.6 s. The controller enforces the travel limits by itself (a down
 stream stops at the min limit with ease-out).
-No keepalive needed: an idle connection held 300 s with nothing sent after init.
+No keepalive needed to hold the link: an idle connection held 300 s with nothing sent
+after init. But the desk only NOTIFIES for about 35 s after the last command it received
+(init, stop, motion...); then it goes silent on a healthy connection (measured 2026-10-15
+on the local adapter, no proxy: frames for 34.3 s after init, then nothing for 116 s, no
+disconnect; one idle/stop frame `dd 00 30 00 00 00 05 35` restarted them after 0.1 s for
+another 35.9 s). Through an ESPHome proxy it behaves the same (HA log: silence ~35 s
+after each connect). The burst after a command is: 9d 01 status for ~1 s, then 9d 02
+config at ~10/s; status frames otherwise only come while something changes (motion,
+handset keys).
 Standby: about 60 minutes after the last activity (a handset key, or the end of the last
 BLE connection) the desk goes into standby and stops advertising entirely: no scanner
 hears it, nothing can connect, and the vendor app cannot reach it either. There is no BLE
@@ -73,9 +81,10 @@ disconnect the advertisements stopped. An open connection prevents standby: with
 connection held (and nothing sent) the desk was still controllable after 71 min. The
 timer restarts at the end of a connection; whether a short connection without any motion
 also restarts it is assumed (keep-awake mode relies on it) but not separately verified.
-While connected the desk sends about 10 frames per second; a connection that looks open
-but carries nothing for several seconds is dead (seen with Bluetooth proxies, which can
-hold a link the host lost: the desk then stops advertising until the link is closed).
+Silence on its own therefore does not mean a dead link. A dead link (seen with Bluetooth
+proxies, which can hold a link the host lost: the desk then stops advertising until the
+link is closed) is one where a harmless idle/stop frame gets no frames back within a
+second or two.
 The BLE module can also hang: seen twice (both times used through ESPHome proxies, last
 good connection ~45 min of keep-awake connections, around a proxy being switched off).
 The handset still works, but the desk does not advertise, a handset key does not bring
@@ -92,7 +101,8 @@ finds nothing); while we are connected the app cannot take over.
 The app's memory presets are app-side; the handset has its own presets M1-M3 stored in the
 desk (see 9d 02). The desk accepts any go-to target.
 
-Status frames (notify), ~10 Hz while connected:
+Status frames (notify), ~10 Hz while the desk is active (for ~35 s after each command, and
+while it moves):
 - type 01, 14 bytes: 9d 01 CC FS ST 64 HH HL 00 00 00 00 00 CK
   CC echoes the current BLE command (30 for handset moves and after stop);
   FS = flags|slot: slot = FS & 0x1F (echoes go-to slot), FS & 0x40 = at min limit,

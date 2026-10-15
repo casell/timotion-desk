@@ -55,6 +55,7 @@ class FakeDesk:
         self.calls: list = []
         self.fail_connect = False
         self.last_frame_age: float | None = None
+        self.probe_answers = True  # a silent but healthy link answers a probe
         self._callbacks: list = []
 
     def register_callback(self, callback):
@@ -93,6 +94,12 @@ class FakeDesk:
 
     async def stop(self) -> None:
         self.calls.append("stop")
+
+    async def probe(self) -> bool:
+        self.calls.append("probe")
+        if self.probe_answers:
+            self.last_frame_age = 0.0  # the desk notifies again after the probe
+        return self.probe_answers
 
 
 @pytest.fixture(autouse=True)

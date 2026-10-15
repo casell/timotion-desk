@@ -46,6 +46,11 @@ class FakeDesk:
         self.is_connected = True
         self.disconnected_callback = None
         self.task: asyncio.Task | None = None
+        # Like the real desk: notify only for a while after the last write received
+        # (~35 s, scaled). None = always notify. dead = a link that answers nothing.
+        self.notify_window: float | None = None
+        self.last_write = 0.0
+        self.dead = False
 
     # BleakClient surface used by TimotionDesk
     async def start_notify(self, _uuid, callback) -> None:
@@ -58,6 +63,7 @@ class FakeDesk:
         frame = bytes(data)
         self.writes.append(frame)
         loop = asyncio.get_running_loop()
+        self.last_write = loop.time()
         if frame == p.HANDSHAKE:
             self.notify(None, bytearray(config_frame((705, 1250, 782, 1101, 1206, 650))))
             return
@@ -104,7 +110,11 @@ class FakeDesk:
             fs = self.slot | (
                 0x40 if self.height == self.min else 0x20 if self.height == self.max else 0
             )
-            self.notify(None, bytearray(status_frame(self.command, fs, state, self.height)))
+            quiet = self.notify_window is not None and (
+                loop.time() - self.last_write > self.notify_window
+            )
+            if not self.dead and not quiet:
+                self.notify(None, bytearray(status_frame(self.command, fs, state, self.height)))
             await asyncio.sleep(TICK)
 
 
@@ -280,3 +290,39 @@ async def test_last_frame_age(fake):
     fake.task.cancel()  # the link goes silent
     await asyncio.sleep(0.2)
     assert desk.last_frame_age >= 0.2
+
+
+async def test_probe_wakes_a_silent_desk(fake):
+    """The desk goes quiet ~35 s after the last command; one stop frame wakes it."""
+    fake.notify_window = 0.1
+    desk = await connected(fake)
+    await asyncio.sleep(0.3)
+    assert desk.last_frame_age > 0.15  # silent, but the link is fine
+    writes = len(fake.writes)
+    assert await desk.probe(timeout=0.5) is True
+    assert fake.writes[writes:] == [p.STOP]  # exactly one frame, never motion
+    assert desk.connected
+
+
+async def test_probe_detects_a_dead_link(fake):
+    desk = await connected(fake)
+    fake.dead = True  # e.g. a link a proxy kept after the host lost it
+    await asyncio.sleep(0.05)
+    assert await desk.probe(timeout=0.2) is False
+
+
+async def test_probe_sends_nothing_during_motion(fake):
+    desk = await connected(fake)
+    move = asyncio.create_task(desk.move_up(1.0))
+    await asyncio.sleep(0.05)
+    writes = len(fake.writes)
+    assert await desk.probe(timeout=0.2) is True
+    assert p.STOP not in fake.writes[writes:]  # the motion stream is untouched
+    await desk.stop()
+    await move
+
+
+async def test_probe_when_disconnected(fake):
+    desk = await connected(fake)
+    await desk.disconnect()
+    assert await desk.probe(timeout=0.2) is False

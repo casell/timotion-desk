@@ -278,20 +278,35 @@ async def test_keep_awake_skips_silent_desk(
     assert desk.calls.count("connect") == 1  # only the initial one
 
 
-async def test_stale_connection_closed(
+async def test_silent_desk_is_probed_not_closed(
     hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
 ):
+    """An idle desk stops notifying ~35 s after a command: probe, keep the link."""
     desk = await setup(hass, entry, {CONF_CONNECTION_MODE: MODE_ALWAYS})
     now = dt_util.utcnow()
-    desk.last_frame_age = 3.0  # live link: frames keep coming
+    desk.last_frame_age = 3.0  # frames still flowing: nothing to do
     async_fire_time_changed(hass, now + timedelta(seconds=6))
     await hass.async_block_till_done()
-    assert desk.connected
-    desk.last_frame_age = 20.0  # looks connected, but nothing arrives
+    assert "probe" not in desk.calls
+    desk.last_frame_age = 20.0  # silent, but the link is fine
     async_fire_time_changed(hass, now + timedelta(seconds=12))
     await hass.async_block_till_done()
-    assert desk.calls.count("disconnect") == 1
-    async_fire_time_changed(hass, now + timedelta(seconds=24))  # reconnect delay
+    assert desk.calls.count("probe") == 1
+    assert "disconnect" not in desk.calls and desk.connected
+
+
+async def test_dead_link_is_closed_and_reconnected(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry
+):
+    """Silent and no answer to the probe: a dead link (e.g. kept by a proxy)."""
+    desk = await setup(hass, entry, {CONF_CONNECTION_MODE: MODE_ALWAYS})
+    now = dt_util.utcnow()
+    desk.last_frame_age = 20.0
+    desk.probe_answers = False
+    async_fire_time_changed(hass, now + timedelta(seconds=6))
+    await hass.async_block_till_done()
+    assert desk.calls.count("probe") == 1 and desk.calls.count("disconnect") == 1
+    async_fire_time_changed(hass, now + timedelta(seconds=18))  # reconnect delay
     await hass.async_block_till_done()
     assert desk.connected and desk.calls.count("connect") == 2
 

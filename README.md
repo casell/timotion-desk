@@ -96,9 +96,12 @@ You can also add it via *Settings → Devices & services → Add integration →
   proxies: the handset keeps working, but the desk stops advertising and nothing can
   connect, not even after a handset key press or a proxy restart. Unplugging the desk for
   about 10 seconds brings it back. In *Keep awake* and *Always connected* mode Home
-  Assistant shows a repair notice when the desk has not been heard for 5 minutes. The
-  integration also closes any connection that carries no data for 15 s (a link a proxy
-  kept after Home Assistant lost it) and reconnects if needed.
+  Assistant shows a repair notice when the desk has not been heard for 5 minutes.
+- **Dead connections are detected.** An idle desk stops sending data about 35 s after
+  the last command, which is normal. When a connection has been silent for 15 s the
+  integration sends one harmless stop frame; a healthy desk answers at once. Only a
+  connection that does not answer (a link a proxy kept after Home Assistant lost it) is
+  closed, and in *Always connected* mode re-established.
 
 ## Development
 

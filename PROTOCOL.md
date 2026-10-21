@@ -90,6 +90,16 @@ good connection ~45 min of keep-awake connections, around a proxy being switched
 The handset still works, but the desk does not advertise, a handset key does not bring
 it back, restarting the proxies does not either; only a power cycle does (it advertises
 again within seconds of being plugged back in).
+Seen again on 2026-10-20/21 (always-connected mode, ESPHome proxies 2026.9 → 2026.10): the
+link closed at an HA restart (20/10 20:35) and the desk never came back; a quick unplug the
+next morning gave a connection for an instant only, then silence for 8 h. While hung the desk
+is not heard by any scanner, not even a local BlueZ adapter scanning continuously in the same
+room (other devices heard fine), so the proxies (scan 30/320 ms, connection slots free) are
+not the cause; restarting and updating both proxies did not help, a handset key did not
+either. Unplugging for about 5 minutes did: advertising within seconds of power returning
+(-60 dBm on the local adapter), connected 3 s later through a proxy, then stable. A short
+power cut (a few seconds) is not always enough. Possible trigger: the connection being
+dropped abruptly (HA restart, proxy switched off) rather than closed; not proven.
 On a warm reconnect frames arrive without handshake and motion works without init;
 cold state untested, so always send both (cheap).
 Handset vs BLE: while a BLE go-to streams, a handset key shows in ST (key bit) but is

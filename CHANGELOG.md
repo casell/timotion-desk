@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.10
+
+- **Repair notice: unplug for a few minutes.** When the desk's Bluetooth module hangs, a power cut of a few
+  seconds is not always enough (seen 2026-10-21): the notice now says to unplug it for about 5 minutes, and that
+  restarting the Bluetooth proxies does not help. `PROTOCOL.md` documents the new cases.
+
 ## 0.1.9
 
 - **Always connected no longer drops the connection every minute.** An idle desk stops

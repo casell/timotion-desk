@@ -397,9 +397,10 @@ class DeskCoordinator:
             return
         self._issue_key = key
         _LOGGER.warning(
-            "%s: not heard by any Bluetooth adapter or proxy that can connect for %.0f min%s",
+            "%s: %s by any Bluetooth adapter or proxy that can connect%s",
             self.entry.title,
-            min(silent, 10**6) / 60,
+            # inf = no advertisement on record (e.g. since startup), not a duration
+            "never heard" if silent == float("inf") else f"not heard for {silent / 60:.0f} min",
             " (only by scanners that cannot connect)" if key == ISSUE_NO_CONNECTABLE else "",
         )
         async_report_unreachable(self.hass, self.entry, key)

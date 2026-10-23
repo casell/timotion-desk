@@ -1,3 +1,4 @@
+import re
 import time
 from datetime import timedelta
 from unittest.mock import MagicMock, patch
@@ -365,6 +366,7 @@ async def test_unreachable_issue(
     fake_desk,
     entry,
     freezer,
+    caplog,
     mode,
     expect_issue,
 ):
@@ -380,6 +382,7 @@ async def test_unreachable_issue(
     assert (issue is not None) is expect_issue
     if expect_issue:
         assert issue.translation_key == "unreachable"
+        assert re.search(r"not heard for \d+ min by any Bluetooth adapter", caplog.text)
         # The desk is heard again: the notice goes away.
         entry.runtime_data._on_advertisement(service_info(), None)
         assert ir.async_get(hass).async_get_issue(DOMAIN, issue_id) is None
@@ -412,6 +415,31 @@ async def test_passive_only_issue_in_any_mode(
     assert issue is not None and issue.translation_key == "no_connectable_scanner"
     entry.runtime_data._on_advertisement(service_info(), None)  # a connectable scanner again
     assert ir.async_get(hass).async_get_issue(DOMAIN, f"unreachable_{entry.entry_id}") is None
+
+
+async def test_unreachable_log_never_heard(
+    hass: HomeAssistant, enable_bluetooth, desk_present, fake_desk, entry, freezer, caplog
+):
+    """No advertisement on record from a connectable scanner: no made-up duration in the log."""
+    desk = await setup(hass, entry)
+    await desk.disconnect()
+
+    def last_service_info(_hass, _address, connectable=True):
+        if connectable:
+            return None
+        return MagicMock(time=bluetooth.MONOTONIC_TIME() - 1, source="C4:D8:D5:00:00:01")
+
+    with patch(
+        "homeassistant.components.bluetooth.async_last_service_info", side_effect=last_service_info
+    ):
+        freezer.tick(timedelta(minutes=6))
+        async_fire_time_changed(hass)
+        await hass.async_block_till_done()
+    assert (
+        "never heard by any Bluetooth adapter or proxy that can connect "
+        "(only by scanners that cannot connect)" in caplog.text
+    )
+    assert not re.search(r"\d+ min", caplog.text)
 
 
 async def test_connect_error_names_passive_only_scanners(

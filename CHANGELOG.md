@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.11
+
+- **Clearer log when the desk has never been heard.** When no Bluetooth adapter or proxy that can
+  connect had heard the desk (for example since Home Assistant started), the warning said "for 16667
+  min", a cap in the code rather than a duration. It now says "never heard"; with a known duration it
+  says "not heard for N min". Log text only: behaviour and the repair notice are unchanged.
+
 ## 0.1.10
 
 - **Repair notice: unplug for a few minutes.** When the desk's Bluetooth module hangs, a power cut of a few
